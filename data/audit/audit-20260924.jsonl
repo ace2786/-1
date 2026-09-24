@@ -278,3 +278,15 @@
 {"ts": "2026-09-24T12:08:07.619843+00:00", "event": "agent_tool_call", "case_id": "952c5a2c1357", "actor": "user", "action": "get_analysis", "input": {"key": "contradictions"}, "observation_len": 1370}
 {"ts": "2026-09-24T12:08:08.980876+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
 {"ts": "2026-09-24T12:08:08.981045+00:00", "event": "agent_final", "case_id": "952c5a2c1357", "actor": "user", "question": "本案一共有多少处事实矛盾？", "steps": 2}
+{"ts": "2026-09-24T12:11:17.391788+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:11:17.402963+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:11:34.515530+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T12:11:35.583279+00:00", "event": "agent_tool_call", "case_id": "32db993ed208", "actor": "user", "action": "search_case", "input": {"query": "是否存在矛盾"}, "observation_len": 585}
+{"ts": "2026-09-24T12:11:37.097034+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T12:11:37.097244+00:00", "event": "agent_final", "case_id": "32db993ed208", "actor": "user", "question": "一共有多少个地方出现矛盾呢", "steps": 2}
+{"ts": "2026-09-24T12:11:45.622316+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:11:45.624402+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:12:00.284278+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:12:00.286265+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:12:03.135121+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:12:03.135375+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}

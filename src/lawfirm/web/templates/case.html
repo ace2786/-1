@@ -63,7 +63,7 @@
     <div id="sc_out" style="font-size:13px"></div></div>
   <!-- ===== right: assistant ===== -->
   <aside class="chatpane">
-    <div class="ch">🤖 AI助手 <span style="font-size:11px;color:var(--mut)">· 上下文锁定本页</span></div>
+    <div class="ch">🤖 AI助手 <span style="font-size:11px;color:var(--mut)">· 上下文锁定本页</span><button onclick="chatStage(true)" title="放大工作台" style="float:right;background:var(--acc);border:0;color:#fff;border-radius:7px;padding:3px 10px;cursor:pointer;font-size:12.5px">⛶ 放大工作台</button></div>
     <div id="chatlog" class="cbody"></div>
     <div class="cfoot">
       <textarea id="q" rows="2" placeholder="例如：本案一共有多少处事实矛盾？" style="width:100%;resize:none;background:#0d1220;border:1px solid #2a3550;color:var(--ink);border-radius:8px;padding:8px;font-size:13px"></textarea>
@@ -74,6 +74,17 @@
     </div>
   </aside>
 </div>
+<div id="stage" style="display:none;position:fixed;inset:0;background:rgba(5,8,14,.75);z-index:50;backdrop-filter:blur(3px)">
+ <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(920px,92vw);height:min(86vh,900px);background:var(--card);border:1px solid var(--acc);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6)">
+  <div style="padding:14px 20px;border-bottom:1px solid #2a3550;display:flex;align-items:center;gap:12px">
+    <b style="font-size:16px">🤖 AI 办案助手</b><span style="color:var(--mut);font-size:12px">ReAct 多智能体 · 工具自主调用 · 全程审计</span>
+    <button onclick="chatStage(false)" style="margin-left:auto;background:#232d45;border:0;color:var(--ink);border-radius:8px;padding:5px 14px;cursor:pointer">✕ 收起 (Esc)</button></div>
+  <div id="stage-log" style="flex:1;overflow:auto;padding:22px 26px"></div>
+  <div style="border-top:1px solid #2a3550;padding:14px 20px;display:flex;gap:10px;align-items:flex-end">
+    <textarea id="stage-q" rows="2" placeholder="向助手提问，Enter 发送 / Shift+Enter 换行…（回答同步回右侧小窗）" style="flex:1;resize:none;background:#0d1220;border:1px solid #2a3550;color:var(--ink);border-radius:10px;padding:11px 14px;font-size:14.5px"></textarea>
+    <label style="font-size:12px;color:var(--mut);white-space:nowrap"><input type="checkbox" id="stage-heavy">深度<br>模型</label>
+    <button onclick="ask()" style="padding:11px 22px;font-size:14.5px">发送 ↵</button></div>
+ </div></div>
 {% endblock %}
 {% block scripts %}<style>
 .layout{display:grid;grid-template-columns:270px minmax(0,1fr) 340px;gap:14px;height:calc(100vh - 90px)}
@@ -160,14 +171,17 @@ function fmtAnswer(txt){const lines=(txt||'').split(/\n+/).filter(x=>x.trim());l
   const isNum=/^\s*(?:\d+[\.、]|[-•])/.test(ln);
   html+=isNum?`<div style="display:flex;gap:8px;margin:7px 0"><span style="color:var(--acc);font-weight:bold;flex:none">▸</span><span>${t}</span></div>`:`<div style="margin:7px 0">${t}</div>`}
  return html}
-async function ask(){if(!q.value.trim())return;const t=q.value;q.value='';
- chatlog.insertAdjacentHTML('beforeend',`<div class="msg user"><b>我：</b>${esc(t)}</div>`);
- const ph=document.createElement('div');ph.className='msg';ph.id='typing';ph.textContent='🤖 思考中（ReAct+工具调用）…';chatlog.appendChild(ph);
+async function ask(){const big=document.getElementById('stage').style.display==='block';
+ const src=big?document.getElementById('stage-q'):q;const t=(src.value||'').trim();if(!t)return;
+ q.value='';const sq=document.getElementById('stage-q');sq.value='';
+ const both=h=>{chatlog.insertAdjacentHTML('beforeend',h);const sl=document.getElementById('stage-log');sl.insertAdjacentHTML('beforeend',h);sl.scrollTop=sl.scrollHeight;chatlog.scrollTop=chatlog.scrollHeight};
+ both(`<div class="msg user" style="border-left:4px solid #2a3550"><b>👤 我：</b>${esc(t)}</div>`);
+ const pid='tp'+Date.now();both(`<div class="msg" id="${pid}" style="color:var(--mut)">🤖 思考中（ReAct循环+工具调用）…</div>`);
  const openEl=document.getElementById('r-'+curTab);const pageCtx=openEl?openEl.innerText.slice(0,2500):'';
- const r=await fetch('/api/cases/'+CID+'/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:t,page_context:pageCtx,heavy:heavy.checked})});
- const j=await r.json();ph.remove();
+ let j;try{j=await (await fetch('/api/cases/'+CID+'/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:t,page_context:pageCtx,heavy:(big?document.getElementById('stage-heavy'):document.getElementById('heavy')).checked})})).json()}catch(e){document.querySelectorAll('[id^="tp"]').forEach(x=>x.remove());both('<div class="msg" style="color:var(--bad)">请求失败:'+esc(String(e))+'</div>');return}
+ document.querySelectorAll('[id^="tp"]').forEach(x=>x.remove());
  const steps=(j.steps||[]).map(s=>s.type=='tool'?('🔧 '+s.action+' '+JSON.stringify(s.input)):('✅ 得出结论')).join('\n');
- chatlog.insertAdjacentHTML('beforeend',`<div class="msg" style="background:#131a29;border:1px solid var(--acc);border-left:4px solid var(--acc)"><b style="color:var(--acc)">🤖 AI 助手</b><div style="margin-top:6px;font-size:14px;line-height:1.9">${fmtAnswer(j.answer)}</div><details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--mut)">🔍 查看执行轨迹（${j.steps.length}步工具调用）</summary><div class="steps" style="white-space:pre-wrap">${esc(steps)}</div></details></div>`);chatlog.scrollTop=chatlog.scrollHeight}
+ both(`<div class="msg" style="background:#131a29;border:1px solid var(--acc);border-left:4px solid var(--acc)"><b style="color:var(--acc)">🤖 AI 助手</b><div style="margin-top:6px;font-size:14.5px;line-height:2">${fmtAnswer(j.answer)}</div><details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--mut)">🔍 查看执行轨迹（${j.steps.length}步工具调用）</summary><div class="steps" style="white-space:pre-wrap">${esc(steps)}</div></details></div>`)}
 q.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask()}});
 /* ---------- boot ---------- */
 window.addEventListener('load',async()=>{await loadDocs();
@@ -184,4 +198,8 @@ window.addEventListener('load',()=>{fetch('/api/sentencing',{method:'POST',heade
  fetch('/api/metrics').then(r=>r.json()).then(()=>{});
  /* populate charges via error hint */
  fetch('/api/sentencing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({charge:'?'})}).then(r=>r.json()).then(j=>{(j.result.supported||[]).forEach(c=>{sc_charge.insertAdjacentHTML('beforeend',`<option>${c}</option>`)})})});
+
+function chatStage(on){document.getElementById('stage').style.display=on?'block':'none';if(on)setTimeout(()=>document.getElementById('stage-q').focus(),50)}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')chatStage(false)});
+document.getElementById('stage-q').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask()}});
 </script>{% endblock %}
