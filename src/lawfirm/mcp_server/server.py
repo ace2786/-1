@@ -45,6 +45,15 @@ def _tools():
         return json.dumps([{kk: r[kk] for kk in ("doc_name", "page", "score", "chunk_id")} | {"snippet": r["text"][:300]} for r in res], ensure_ascii=False)
 
     @mcp.tool()
+    async def sentencing_advise(charge: str, amount_yuan: float = 0, victims: int = 0,
+                                factors: str = "") -> str:
+        """Deterministic sentencing-range suggestion. factors: comma list of
+        guilty_plea/confession/surrender/meritorious/restitution/recidivist/organizer."""
+        from ..analysis.sentencing import advise
+        fl = [x.strip() for x in factors.split(",") if x.strip()]
+        return json.dumps(advise(charge, amount_yuan, victims, fl), ensure_ascii=False)
+
+    @mcp.tool()
     async def ask_assistant(case_id: str, question: str, heavy: bool = False) -> str:
         '''Ask the ReAct assistant about a case; returns answer + step trace.'''
         out = await agent_ask(question, case_id, heavy=heavy)

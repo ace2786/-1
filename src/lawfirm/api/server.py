@@ -65,6 +65,22 @@ async def models():
     return await llm.ensure_models()
 
 
+class SentencingBody(BaseModel):
+    charge: str
+    amount_yuan: float = 0
+    victims: int = 0
+    factors: list[str] = []
+
+
+@app.post("/api/sentencing")
+async def sentencing(body: SentencingBody):
+    """Deterministic statutory sentencing suggestion (offline rule engine)."""
+    from ..analysis.sentencing import advise, RULES
+    audit("sentencing_query", actor="user", **body.model_dump())
+    return {"supported_charges": list(RULES), "result": advise(
+        body.charge, body.amount_yuan, body.victims, body.factors)}
+
+
 @app.get("/api/metrics")
 async def metrics(_=Depends(check_token)):
     return Metrics.snapshot()

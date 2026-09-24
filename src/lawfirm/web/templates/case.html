@@ -45,6 +45,22 @@
     </div>
   </section>
 
+  <div class="card" style="margin-top:14px"><b style="font-size:15px">⚖️ 量刑建议（确定性法条引擎）</b>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center;font-size:13px">
+      <select id="sc_charge" style="max-width:200px"></select>
+      <input id="sc_amt" type="number" placeholder="涉案金额(元)" style="width:150px">
+      <input id="sc_vic" type="number" placeholder="受害人数" style="width:100px">
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:8px 0;font-size:12.5px;color:var(--mut)">
+      <label><input type="checkbox" class="fct" value="guilty_plea">认罪认罚</label>
+      <label><input type="checkbox" class="fct" value="confession">坦白</label>
+      <label><input type="checkbox" class="fct" value="surrender">自首</label>
+      <label><input type="checkbox" class="fct" value="restitution">退赃/谅解</label>
+      <label><input type="checkbox" class="fct" value="recidivist">累犯</label>
+      <label><input type="checkbox" class="fct" value="organizer">主犯</label>
+      <button onclick="sentencing()" style="margin-left:auto">计算量刑区间</button>
+    </div>
+    <div id="sc_out" style="font-size:13px"></div></div>
   <!-- ===== right: assistant ===== -->
   <aside class="chatpane">
     <div class="ch">🤖 AI助手 <span style="font-size:11px;color:var(--mut)">· 上下文锁定本页</span></div>
@@ -150,4 +166,14 @@ window.addEventListener('load',async()=>{await loadDocs();
  fetch('/api/cases/'+CID+'/analyses').then(r=>r.json()).then(all=>{let n=0;for(const k in all){paint(k,all[k]);n++}rmeta.textContent=n?`${n}/7 已生成`:'';showTab(curTab)});
  document.querySelectorAll('.rpane').forEach(el=>{if(el.dataset.key!=='evidence')el.style.display='none'});
  if(Object.keys(DOCS).length)selectDoc(Object.keys(DOCS)[0])});
+
+async function sentencing(){const body={charge:sc_charge.value,amount_yuan:+sc_amt.value||0,victims:+sc_vic.value||0,factors:[...document.querySelectorAll('.fct:checked')].map(x=>x.value)};
+ const r=await fetch('/api/sentencing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json();
+ const d=j.result;if(d.error){sc_out.innerHTML='<span style=color:var(--warn)>'+esc(d.error)+'</span>';return}
+ const mo=x=>x>=12?`约${Math.round(x/12*10)/10}年`:`约${Math.round(x)}个月`;
+ sc_out.innerHTML=`<div class="item"><b>${esc(d.charge)}</b>（${esc(d.article)}·${esc(d.tier)}）<br>法定档：${esc(d.tier_note)}<br>基准刑区间：<b>${mo(d.base_range_months[0])} ~ ${d.base_range_months[1]?mo(d.base_range_months[1]):'—'}</b>　考虑情节后：<b style=color:var(--ok)>${mo(d.adjusted_range_months[0])} ~ ${d.adjusted_range_months[1]?mo(d.adjusted_range_months[1]):'—'}</b><ul style="margin:6px 0;padding-left:20px;font-size:12px;color:var(--mut)">${d.applied_factors.map(f=>'<li>'+esc(f.desc)+'</li>').join('')||'<li>无从宽/从严情节</li>'}</ul><p style="font-size:11.5px;color:var(--warn)">${d.caveats.map(esc).join('<br>')}</p></div>`}
+window.addEventListener('load',()=>{fetch('/api/sentencing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({charge:'__list__'})}).catch(()=>{});
+ fetch('/api/metrics').then(r=>r.json()).then(()=>{});
+ /* populate charges via error hint */
+ fetch('/api/sentencing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({charge:'?'})}).then(r=>r.json()).then(j=>{(j.result.supported||[]).forEach(c=>{sc_charge.insertAdjacentHTML('beforeend',`<option>${c}</option>`)})})});
 </script>{% endblock %}

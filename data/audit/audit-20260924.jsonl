@@ -175,3 +175,13 @@
 {"ts": "2026-09-24T09:25:26.908258+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
 {"ts": "2026-09-24T09:25:36.827120+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
 {"ts": "2026-09-24T09:28:28.561765+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T09:29:48.590354+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T09:29:59.333131+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T09:30:11.450979+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T09:30:25.429815+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T09:30:46.853824+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T09:34:29.805438+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "非法吸收公众存款罪", "amount_yuan": 42000000.0, "victims": 62, "factors": ["guilty_plea"]}
+{"ts": "2026-09-24T09:34:29.816065+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "不存在的罪名", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T09:35:01.411156+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "非法吸收公众存款罪", "amount_yuan": 42000000.0, "victims": 62, "factors": ["guilty_plea"]}
+{"ts": "2026-09-24T09:35:01.449812+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "非法吸收公众存款罪", "amount_yuan": 60000000.0, "victims": 62, "factors": []}
+{"ts": "2026-09-24T09:35:01.487563+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "盗窃罪", "amount_yuan": 5000.0, "victims": 0, "factors": ["surrender", "restitution"]}
