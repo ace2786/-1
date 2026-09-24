@@ -163,7 +163,7 @@ async function ask(){if(!q.value.trim())return;const t=q.value;q.value='';
 q.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask()}});
 /* ---------- boot ---------- */
 window.addEventListener('load',async()=>{await loadDocs();
- fetch('/api/cases/'+CID+'/analyses').then(r=>r.json()).then(all=>{let n=0;for(const k in all){paint(k,all[k]);n++}rmeta.textContent=n?`${n}/7 已生成`:'';showTab(curTab)});
+ fetch('/api/cases/'+CID+'/analyses').then(r=>r.json()).then(j=>{const all=j.data||{},meta=j.meta||{};let n=0;for(const k in all){if(meta[k]&&meta[k].applicable===false)continue;paint(k,all[k]);n++}rmeta.textContent=n?`${n}/7 已生成`:'';Object.entries(meta).forEach(([k,v])=>{if(v.applicable===false){const b=document.querySelector('.rtab[data-key="'+k+'"]');if(b)b.remove();const d=document.getElementById('r-'+k);if(d)d.remove()}});showTab(curTab)});
  document.querySelectorAll('.rpane').forEach(el=>{if(el.dataset.key!=='evidence')el.style.display='none'});
  if(Object.keys(DOCS).length)selectDoc(Object.keys(DOCS)[0])});
 

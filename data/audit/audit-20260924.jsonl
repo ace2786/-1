@@ -246,3 +246,9 @@
 {"ts": "2026-09-24T10:05:12.401327+00:00", "event": "analysis_run", "case_id": "952c5a2c1357", "actor": "user", "status": "ok", "duration_s": 8.535, "error": null}
 {"ts": "2026-09-24T10:05:29.107220+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
 {"ts": "2026-09-24T10:05:29.107398+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 16.683, "error": null}
+{"ts": "2026-09-24T10:36:13.889692+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:36:13.891824+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:36:23.660025+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:36:23.660556+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:36:31.766642+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:36:31.768057+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}

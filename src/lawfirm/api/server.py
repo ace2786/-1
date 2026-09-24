@@ -184,7 +184,12 @@ async def analyze(case_id: str, body: AnalyzeBody):
 
 @app.get("/api/cases/{case_id}/analyses")
 async def analyses(case_id: str):
-    return all_analyses(case_id)
+    data = all_analyses(case_id)
+    meta = {}
+    for k, v in data.items():
+        if isinstance(v, dict) and v.get("applicable") is False:
+            meta[k] = {"applicable": False}
+    return {"data": data, "meta": meta}
 
 
 @app.get("/api/cases/{case_id}/chunk/{chunk_id}")
