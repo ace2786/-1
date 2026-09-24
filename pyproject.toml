@@ -14,11 +14,12 @@ dependencies = [
     "pandas>=2.2",
     "numpy>=1.26",
     "chromadb>=0.5",
-    "mcp>=1.0",
+    "mcp>=1.0,<2",
     "typer>=0.12",
     "rich>=13.0",
     "structlog>=24.1",
     "pydantic-settings>=2.4",
+    "pillow>=10.0",
 ]
 
 [tool.uv]
@@ -32,4 +33,4 @@ build-backend = "hatchling.build"
 packages = ["src/lawfirm"]
 
 [project.scripts]
-lawfirm = "lawfirm.cli.main:app"pillow>=10.0
+lawfirm = "lawfirm.cli.main:app"

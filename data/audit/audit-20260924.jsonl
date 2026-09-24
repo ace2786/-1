@@ -173,3 +173,5 @@
 {"ts": "2026-09-24T09:24:51.060292+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
 {"ts": "2026-09-24T09:24:51.060629+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 7.732, "error": null}
 {"ts": "2026-09-24T09:25:26.908258+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T09:25:36.827120+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T09:28:28.561765+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
