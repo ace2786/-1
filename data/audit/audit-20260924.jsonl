@@ -119,3 +119,21 @@
 {"ts": "2026-09-24T06:50:46.418175+00:00", "event": "agent_tool_call", "case_id": "248e7c69217f", "actor": "user", "action": "get_analysis", "input": {"key": "contradictions"}, "observation_len": 385}
 {"ts": "2026-09-24T06:50:47.459234+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
 {"ts": "2026-09-24T06:50:47.459404+00:00", "event": "agent_final", "case_id": "248e7c69217f", "actor": "user", "question": "本案一共有多少处事实矛盾？", "steps": 2}
+{"ts": "2026-09-24T07:07:58.038776+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T07:07:58.039958+00:00", "event": "agent_tool_call", "case_id": "b5e67f66ac70", "actor": "user", "action": "get_analysis", "input": {"key": "contradictions"}, "observation_len": 7}
+{"ts": "2026-09-24T07:07:58.376129+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T07:07:58.376382+00:00", "event": "agent_tool_call", "case_id": "b5e67f66ac70", "actor": "user", "action": "get_analysis", "input": {"key": "contradictions"}, "observation_len": 7}
+{"ts": "2026-09-24T07:07:59.061292+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T07:07:59.061436+00:00", "event": "agent_final", "case_id": "b5e67f66ac70", "actor": "user", "question": "本案一共有多少处事实矛盾？", "steps": 3}
+{"ts": "2026-09-24T07:09:16.573561+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T07:09:16.577646+00:00", "event": "analysis_run", "case_id": "b5e67f66ac70", "actor": "user", "status": "ok", "duration_s": 12.071, "error": null}
+{"ts": "2026-09-24T07:09:31.345241+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T07:09:31.345811+00:00", "event": "analysis_run", "case_id": "b5e67f66ac70", "actor": "user", "status": "ok", "duration_s": 26.839, "error": null}
+{"ts": "2026-09-24T07:09:46.643531+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T07:09:46.644043+00:00", "event": "analysis_run", "case_id": "b5e67f66ac70", "actor": "user", "status": "ok", "duration_s": 42.138, "error": null}
+{"ts": "2026-09-24T07:11:20.858295+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T07:11:20.860132+00:00", "event": "agent_tool_call", "case_id": "b5e67f66ac70", "actor": "user", "action": "get_analysis", "input": {"key": "contradictions"}, "observation_len": 396}
+{"ts": "2026-09-24T07:11:21.999814+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T07:11:21.999962+00:00", "event": "agent_final", "case_id": "b5e67f66ac70", "actor": "user", "question": "本案一共有多少处事实矛盾？", "steps": 2}
+{"ts": "2026-09-24T07:12:29.264021+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T07:12:29.265825+00:00", "event": "analysis_run", "case_id": "b5e67f66ac70", "actor": "user", "status": "ok", "duration_s": 7.814, "error": null}

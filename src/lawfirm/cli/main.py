@@ -66,8 +66,13 @@ def add_doc(case_id: str, path: Path):
 @app.command()
 def analyze(case_id: str, key: str = typer.Option(None, help="evidence|timeline|contradictions|irrelevant|summary|trial_strategy|bank_flow；缺省=全部")):
     '''运行卷宗分析（深度模型）。'''
-    from ..analysis.reports import run_analysis, run_all
-    out = _run(run_all(case_id) if not key else {key: asyncio.run(run_analysis(case_id, key))})
+    async def _go():
+        from ..analysis.reports import run_analysis, run_all
+        if key:
+            return {key: await run_analysis(case_id, key)}
+        return await run_all(case_id)
+
+    out = _run(_go())
     console.print_json(json.dumps(out, ensure_ascii=False))
 
 
