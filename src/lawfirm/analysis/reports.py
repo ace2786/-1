@@ -63,16 +63,57 @@ def _material(case_id: str, max_chars: int = 12000) -> tuple[str, list[dict]]:
     return "\n\n".join(buf), used
 
 
+def _match_doc(hint, used_chunks):
+    """Resolve a possibly-messy doc reference to the real doc_name (fuzzy)."""
+    if not hint:
+        return None
+    h = str(hint).strip().replace("·", "").split("第")[0]
+    names = {c["doc_name"] for c in used_chunks}
+    for n in names:
+        base = n.rsplit(".", 1)[0]
+        if h == n or h == base or h in n or n in h or (len(h) > 4 and h[:4] in base):
+            return n
+    # heading-style hint: find any chunk whose text contains the hint -> its doc
+    for c in used_chunks:
+        if hint and str(hint)[:12] in c["text"]:
+            return c["doc_name"]
+    return None
+
+
 def _fix_claims(payload, used_chunks):
     """Attach chunk anchors to contradictions' claim_a/claim_b too."""
+    picked = set()
+
+    def norm(t):
+        import re as _re
+        return _re.sub(r"[\s，。：；、\"\"''（）()【】\[\]…—-]", "", str(t or ""))
+
     def find_chunk(doc_hint, text):
-        t = (text or "").strip()[:24]
+        tn = norm(text)[:16]
+        want = _match_doc(doc_hint, used_chunks)
+        # 1) exact quote containment, doc-preferred, no double-pick
         for c in used_chunks:
-            if t and t in c["text"] and (not doc_hint or doc_hint in c["doc_name"]):
-                return c
+            if id(c) in picked:
+                continue
+            cn = norm(c["text"])
+            if tn and tn in cn and (not want or c["doc_name"] == want):
+                picked.add(id(c)); return c
+        # 2) longest common substring >= 10 chars (handles paraphrased quotes)
+        best, bl = None, 0
         for c in used_chunks:
-            if doc_hint and doc_hint in c["doc_name"]:
-                return c
+            if id(c) in picked or (want and c["doc_name"] != want):
+                continue
+            import difflib
+            m = difflib.SequenceMatcher(None, tn, norm(c["text"])).find_longest_match(0, len(tn), 0, 400)
+            if m.size > bl:
+                best, bl = c, m.size
+        if best and bl >= 10:
+            picked.add(id(best)); return best
+        # 3) fallback by doc name only
+        if want:
+            for c in used_chunks:
+                if id(c) not in picked and c["doc_name"] == want:
+                    picked.add(id(c)); return c
         return None
     if isinstance(payload, dict):
         for it in payload.get("items", []) if isinstance(payload.get("items"), list) else []:
@@ -114,7 +155,9 @@ async def run_analysis(case_id: str, key: str, *, heavy: bool = True) -> dict:
     hint = ""
     if key in ("summary", "trial_strategy", "bank_flow"):
         hint = "\n注意：顶层JSON对象的每个字段都必须填写（没有信息就填空字符串或空数组），items不是这些键的返回结构。"
-    prompt = (f"{_PROMPTS[key]}\n罪名参考：{case.charge or '未知'}\n\n"
+    doc_names = sorted({c["doc_name"] for c in used})
+    prompt = (f"{_PROMPTS[key]}\n罪名参考：{case.charge or '未知'}\n"
+              f"卷宗文件清单（source_doc/doc_name 字段必须逐字使用下列名称之一）：{doc_names}\n\n"
               f"严格输出JSON，形如 {_SCHEMA[key]} 。只依据给定卷宗内容，禁止编造；"
               f"每条结论必须附citations，quote字段填卷宗原文片段。{hint}\n\n===卷宗材料===\n{material}")
     with traced(f"analysis.{key}", event="analysis_run", case_id=case_id):

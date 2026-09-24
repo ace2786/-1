@@ -143,3 +143,33 @@
 {"ts": "2026-09-24T08:57:24.342599+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 13.604, "error": null}
 {"ts": "2026-09-24T08:57:41.758055+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
 {"ts": "2026-09-24T08:57:41.758234+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 17.18, "error": null}
+{"ts": "2026-09-24T09:18:59.345233+00:00", "event": "case_created", "case_id": "c282e8e398fe", "actor": "user", "title": "张某某非法吸收公众存款案（真实卷宗）"}
+{"ts": "2026-09-24T09:18:59.412030+00:00", "event": "doc_parsed", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 0.051, "error": null}
+{"ts": "2026-09-24T09:19:02.005825+00:00", "event": "doc_uploaded", "case_id": "c282e8e398fe", "actor": "user", "doc": "indictment.pdf", "sha256": "98c455ce9b9e", "chunks": 2}
+{"ts": "2026-09-24T09:19:02.437822+00:00", "event": "doc_parsed", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 0.417, "error": null}
+{"ts": "2026-09-24T09:19:02.536470+00:00", "event": "doc_uploaded", "case_id": "c282e8e398fe", "actor": "user", "doc": "bank_flow.xlsx", "sha256": "fc63eb2b7b87", "chunks": 7}
+{"ts": "2026-09-24T09:19:02.842288+00:00", "event": "doc_parsed", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 0.287, "error": null}
+{"ts": "2026-09-24T09:19:02.940430+00:00", "event": "doc_uploaded", "case_id": "c282e8e398fe", "actor": "user", "doc": "mock_scan.png", "sha256": "c31e7e84a810", "chunks": 8}
+{"ts": "2026-09-24T09:19:05.578634+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:19:05.592706+00:00", "event": "agent_tool_call", "case_id": "c282e8e398fe", "actor": "user", "action": "bank_stats", "input": {"column_hint": "收入"}, "observation_len": 236}
+{"ts": "2026-09-24T09:19:06.653831+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:19:06.654066+00:00", "event": "agent_final", "case_id": "c282e8e398fe", "actor": "user", "question": "统计银行流水的收入合计、最大单笔和主要对手方", "steps": 2}
+{"ts": "2026-09-24T09:20:02.339917+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:20:02.341935+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 32.366, "error": null}
+{"ts": "2026-09-24T09:20:39.028807+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:20:39.030082+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 36.687, "error": null}
+{"ts": "2026-09-24T09:20:44.755563+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:20:44.755787+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 5.725, "error": null}
+{"ts": "2026-09-24T09:20:51.471921+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:20:51.473014+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 6.709, "error": null}
+{"ts": "2026-09-24T09:21:08.863332+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:21:08.863617+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 17.39, "error": null}
+{"ts": "2026-09-24T09:21:15.975778+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:21:15.975975+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 7.112, "error": null}
+{"ts": "2026-09-24T09:21:29.686923+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:21:29.687132+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 13.711, "error": null}
+{"ts": "2026-09-24T09:24:03.105970+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:24:03.106226+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 8.452, "error": null}
+{"ts": "2026-09-24T09:24:51.060292+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:24:51.060629+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 7.732, "error": null}
+{"ts": "2026-09-24T09:25:26.908258+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
