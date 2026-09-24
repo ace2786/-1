@@ -119,6 +119,12 @@ class ModelSwitch(BaseModel):
     embed: str | None = None
 
 
+@app.get("/api/flywheel/count")
+async def flywheel_count():
+    from ..agents.flywheel import load_all
+    return {"count": len(load_all())}
+
+
 @app.get("/api/models/installed")
 async def models_installed():
     """List all models available on the local Ollama for switch dropdowns."""
@@ -158,8 +164,44 @@ async def models_set(body: ModelSwitch):
 
 
 @app.get("/api/metrics")
-async def metrics(_=Depends(check_token)):
-    return Metrics.snapshot()
+async def metrics(window_min: int = 30, _=Depends(check_token)):
+    """Live in-process counters + history derived from audit JSONL (cross-restart)."""
+    from datetime import datetime, timedelta, timezone
+    snap = Metrics.snapshot()
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=window_min)
+    llm_n, tool_n, avg_llm_s, series = 0, 0, None, {}
+    durs = []
+    files = sorted(Path(settings.audit_dir).glob("audit-*.jsonl"), reverse=True)[:2]
+    for f in files:
+        try:
+            lines = f.read_text(encoding="utf-8").splitlines()
+        except Exception:  # noqa: BLE001
+            continue
+        for ln in reversed(lines):
+            try:
+                r = json.loads(ln)
+                ts = datetime.fromisoformat(r["ts"])
+                if ts.tzinfo is None:
+                    ts = ts.replace(tzinfo=timezone.utc)
+            except Exception:  # noqa: BLE001
+                continue
+            if ts < cutoff:
+                break
+            ev = r.get("event")
+            if ev == "llm_generate" and r.get("ok"):
+                llm_n += 1
+                if r.get("duration_s"):
+                    durs.append(r["duration_s"])
+                minute = ts.strftime("%H:%M")
+                series[minute] = series.get(minute, 0) + 1
+            elif ev == "agent_tool_call":
+                tool_n += 1
+    if durs:
+        avg_llm_s = round(sum(durs) / len(durs), 2)
+    snap["live"] = {"llm_calls_window": llm_n, "tool_calls_window": tool_n,
+                    "avg_llm_seconds": avg_llm_s, "window_min": window_min,
+                    "spark": [series[k] for k in sorted(series)][-30:]}
+    return snap
 
 
 @app.get("/api/audit/today")

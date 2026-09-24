@@ -299,3 +299,15 @@
 {"ts": "2026-09-24T12:58:50.420300+00:00", "event": "feedback_recorded", "case_id": "c282e8e398fe", "actor": "user", "rating": -1}
 {"ts": "2026-09-24T12:58:51.707936+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
 {"ts": "2026-09-24T12:58:51.708118+00:00", "event": "agent_final", "case_id": "c282e8e398fe", "actor": "user", "question": "这个案子从开始到结束经历了多长时间？", "steps": 1}
+{"ts": "2026-09-24T13:21:19.722605+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T13:21:19.724305+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T13:21:27.245257+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T13:21:27.247420+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T13:22:01.377880+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T13:22:01.378332+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 17.398, "error": null}
+{"ts": "2026-09-24T13:22:14.014455+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T13:22:14.014649+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 12.628, "error": null}
+{"ts": "2026-09-24T13:27:57.909848+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true, "duration_s": 1.97}
+{"ts": "2026-09-24T13:27:58.224526+00:00", "event": "agent_tool_call", "case_id": "c282e8e398fe", "actor": "user", "action": "bank_stats", "input": {"column_hint": "金额列名提示，可空"}, "observation_len": 236}
+{"ts": "2026-09-24T13:27:59.094972+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true, "duration_s": 0.87}
+{"ts": "2026-09-24T13:27:59.095125+00:00", "event": "agent_final", "case_id": "c282e8e398fe", "actor": "user", "question": "本案涉案金额大约多少？", "steps": 2}

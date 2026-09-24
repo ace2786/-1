@@ -16,37 +16,59 @@
 <p style="color:var(--mut);font-size:13px">卷宗 {{c.docs|length}} 份 · 更新 {{c.updated_at[:10]}}</p></a>{% endfor %}</div>
 </div>
 <div id="view-dash" style="display:none">
-<div class="grid" style="margin-bottom:14px">
- <div class="card"><h2 style="font-size:13px;color:var(--mut)">服务健康</h2><div id="d_health" style="font-size:22px;font-weight:bold">…</div><div id="d_hver" style="color:var(--mut);font-size:12px"></div></div>
- <div class="card"><h2 style="font-size:13px;color:var(--mut)">LLM 调用（本进程）</h2><div id="d_calls" style="font-size:22px;font-weight:bold">0</div><div id="d_callbreak" style="color:var(--mut);font-size:12px"></div></div>
- <div class="card"><h2 style="font-size:13px;color:var(--mut)">耗时分布（秒）</h2><table id="d_timers" style="width:100%;border-collapse:collapse;font-size:12.5px"></table></div>
- <div class="card"><h2 style="font-size:13px;color:var(--mut)">今日事件统计</h2><table id="d_evstats" style="width:100%;border-collapse:collapse;font-size:12.5px"></table></div></div>
-<div class="card"><b>执行轨迹流水账</b>
- <select id="fev" onchange="loadAudit()" style="float:right;background:#0d1220;border:1px solid #2a3550;color:var(--ink);border-radius:7px;padding:4px 8px;font-size:12.5px"><option value="">全部事件</option></select>
- <input id="fq" placeholder="过滤关键字…" oninput="loadAudit()" style="float:right;width:150px;margin-right:8px;background:#0d1220;border:1px solid #2a3550;color:var(--ink);border-radius:7px;padding:4px 8px;font-size:12.5px">
- <table id="d_audit" style="width:100%;border-collapse:collapse;font-size:12px;margin-top:10px"><tr><th>时间</th><th>事件</th><th>案件</th><th>详情</th></tr></table></div>
+<style>
+@keyframes popin{from{opacity:0;transform:translateY(-6px)}to{opacity:1}}
+.dcard{background:var(--card);border:1px solid #232d45;border-radius:12px;padding:14px 16px}
+.dnum{font-size:30px;font-weight:bold;transition:.3s}
+.pop{animation:popin .5s ease}
+.spark rect{fill:var(--acc)}.spark rect:hover{fill:var(--ok)}
+.feedrow.new{animation:popin .6s;background:#1a2f22}
+</style>
+<div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:12px">
+ <div class="dcard"><div style="font-size:12px;color:var(--mut)">服务健康</div><div id="d_health" class="dnum">…</div><div id="d_hver" style="color:var(--mut);font-size:12px"></div></div>
+ <div class="dcard"><div style="font-size:12px;color:var(--mut)">LLM调用（近30分钟）</div><div id="d_calls" class="dnum">0</div><svg id="d_spark" class="spark" width="180" height="34" style="margin-top:4px"></svg></div>
+ <div class="dcard"><div style="font-size:12px;color:var(--mut)">工具调用（近30分钟）</div><div id="d_tools" class="dnum">0</div><div id="d_avg" style="color:var(--mut);font-size:12px"></div></div>
+ <div class="dcard"><div style="font-size:12px;color:var(--mut)">飞轮记忆库</div><div id="d_fw" class="dnum">0</div><div style="color:var(--mut);font-size:12px">条专家纠正经验</div></div>
+ <div class="dcard"><div style="font-size:12px;color:var(--mut)">案件 / 卷宗总数</div><div id="d_cases" class="dnum">0 / 0</div><div id="d_chunks" style="color:var(--mut);font-size:12px"></div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1.4fr;gap:12px">
+ <div class="dcard"><b style="font-size:13.5px">操作耗时（秒）</b><table id="d_timers" style="width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px"></table>
+  <b style="font-size:13.5px;display:block;margin-top:12px">事件统计（今日）</b><table id="d_evstats" style="width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px"></table></div>
+ <div class="dcard"><b style="font-size:13.5px">实时事件流</b>
+  <select id="fev" onchange="loadAudit()" style="float:right;background:#0d1220;border:1px solid #2a3550;color:var(--ink);border-radius:7px;padding:3px 6px;font-size:12px"><option value="">全部事件</option></select>
+  <input id="fq" placeholder="过滤…" oninput="loadAudit()" style="float:right;width:110px;margin-right:6px;background:#0d1220;border:1px solid #2a3550;color:var(--ink);border-radius:7px;padding:3px 6px;font-size:12px">
+  <table id="d_audit" style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px"><tr><th>时间</th><th>事件</th><th>详情</th></tr></table></div>
+</div>
 </div>
 {% endblock %}{% block scripts %}<script>
-/* ---- embedded observability ---- */
-let DASH_TIMER=null,ALLR=[];
+/* ---- embedded observability v2 ---- */
+let DASH_TIMER=null,ALLR=[],prevCalls=-1,seenTs={};
 function showView(v){document.getElementById('view-cases').style.display=v==='cases'?'':'none';
  document.getElementById('view-dash').style.display=v==='dash'?'':'none';
  vb_cases.classList.toggle('on',v==='cases');vb_dash.classList.toggle('on',v==='dash');
- if(v==='dash'){tickDash();DASH_TIMER=setInterval(tickDash,5000)}else if(DASH_TIMER){clearInterval(DASH_TIMER);DASH_TIMER=null}}
+ if(v==='dash'){tickDash();DASH_TIMER=setInterval(tickDash,4000)}else if(DASH_TIMER){clearInterval(DASH_TIMER);DASH_TIMER=null}}
 async function jget(u){try{return await (await fetch(u)).json()}catch(e){return null}}
-async function tickDash(){const h=await jget('/api/health');if(h)d_health.innerHTML=h.status==='ok'?'<span style=color:var(--ok)>● 正常</span>':'<span style=color:var(--warn)>● '+h.status+'</span>',d_hver.textContent='Ollama '+(h.ollama||'');
- const m=await jget('/api/metrics');if(m){d_calls.textContent=(m.counters||{}).llm_calls||0;
-  d_callbreak.textContent=Object.entries(m.counters||{}).filter(([k])=>k.startsWith('llm_calls.')).map(([k,v])=>k.slice(10)+':'+v).join(' · ');
-  const t=m.timers||{};d_timers.innerHTML='<tr><th>操作</th><th>次数</th><th>均值</th><th>最大</th></tr>'+Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,7).map(([k,v])=>`<tr><td>${k}</td><td>${v.n}</td><td>${v.avg_s}s</td><td>${v.max_s}s</td></tr>`).join('')}
+function bump(el,val){el.textContent=val;if(prevCalls!==null&&val>prevCalls){el.style.color='var(--ok)';setTimeout(()=>el.style.color='',900)}}
+function drawSpark(sp){const svg=document.getElementById('d_spark');if(!sp||!sp.length){svg.innerHTML='<text x=4 y=20 fill="#8b96ad" font-size=10>暂无数据——去问AI助手几个问题吧</text>';return}
+ const mx=Math.max(...sp),w=180/sp.length;svg.innerHTML=sp.map((v,i)=>`<rect x="${(i*w).toFixed(1)}" y="${34-Math.max(2,v/mx*32)}" width="${(w*0.7).toFixed(1)}" height="${Math.max(2,v/mx*32)}" rx="1"/>`).join('')}
+async function tickDash(){const h=await jget('/api/health');
+ if(h)d_health.innerHTML=h.status==='ok'?'<span style=color:var(--ok)>● 在线</span>':'<span style=color:var(--warn)>● '+h.status+'</span>',d_hver.textContent='Ollama '+(h.ollama||'');
+ const m=await jget('/api/metrics');if(m){const L=m.live||{};
+  bump(d_calls,L.llm_calls_window??0);drawSpark(L.spark);
+  d_tools.textContent=L.tool_calls_window??0;d_avg.textContent=L.avg_llm_seconds?('LLM均值 '+L.avg_llm_seconds+'s/次'):'等待首次模型调用…';
+  const t=m.timers||{};d_timers.innerHTML='<tr><th>操作</th><th>次数</th><th>均值</th><th>最大</th></tr>'+Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,6).map(([k,v])=>`<tr><td>${k}</td><td>${v.n}</td><td>${v.avg_s}s</td><td>${v.max_s}s</td></tr>`).join('')}}
+ const cs=await jget('/api/cases');if(cs){d_cases.textContent=cs.length+' / '+cs.reduce((a,c)=>a+c.n_docs,0);d_chunks.textContent=(cs.reduce((a,c)=>a+c.n_docs,0))+' 份材料已索引'}
+ const fw=await jget('/api/flywheel/count');if(fw)d_fw.textContent=fw.count??0;
  await loadAudit()}
-async function loadAudit(){const a=await jget('/api/audit/history?limit=300');if(!a)return;ALLR=a.records;
+async function loadAudit(){const a=await jget('/api/audit/history?limit=200');if(!a)return;ALLR=a.records;
  const evs=[...new Set(ALLR.map(r=>r.event))];if(fev.options.length<=1)fev.innerHTML='<option value="">全部事件</option>'+evs.map(e=>`<option>${e}</option>`).join('');
  const ef=fev.value,q=fq.value.toLowerCase();
- const rows=ALLR.filter(r=>(!ef||r.event===ef)&&(!q||JSON.stringify(r).toLowerCase().includes(q))).slice(0,100);
- d_audit.innerHTML='<tr><th>时间</th><th>事件</th><th>案件</th><th>详情</th></tr>'+rows.map(r=>{const d={...r};delete d.ts;delete d.event;delete d.case_id;
-  return `<tr><td style="color:var(--mut);white-space:nowrap">${(r.ts||'').slice(11,19)}</td><td><span class="tag">${r.event}</span></td><td style="color:var(--mut)">${r.case_id||'-'}</td><td style="color:var(--mut);word-break:break-all">${JSON.stringify(d).slice(0,140)}</td></tr>`}).join('');
+ const rows=ALLR.filter(r=>(!ef||r.event===ef)&&(!q||JSON.stringify(r).toLowerCase().includes(q))).slice(0,60);
+ d_audit.innerHTML='<tr><th>时间</th><th>事件</th><th>详情</th></tr>'+rows.map(r=>{const isNew=!seenTs[r.ts+r.event];if(isNew)seenTs[r.ts+r.event]=1;
+  const d={...r};delete d.ts;delete d.event;delete d.case_id;
+  return `<tr class="feedrow${isNew?' new':''}"><td style="color:var(--mut);white-space:nowrap">${(r.ts||'').slice(11,19)}</td><td><span class="tag">${r.event}</span></td><td style="color:var(--mut);word-break:break-all">${JSON.stringify(d).slice(0,110)}</td></tr>`}).join('');
  const st={};ALLR.forEach(r=>st[r.event]=(st[r.event]||0)+1);
- d_evstats.innerHTML='<tr><th>事件</th><th>次数</th></tr>'+Object.entries(st).sort((x,y)=>y[1]-x[1]).slice(0,8).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('')}
+ d_evstats.innerHTML='<tr><th>事件</th><th>次数</th></tr>'+Object.entries(st).sort((x,y)=>y[1]-x[1]).slice(0,7).map(([k,v])=>`<tr><td><span class="tag">${k}</span></td><td>${v}</td></tr>`).join('')}
 </script><script>
 async function createCase(){const b={title:t.value,charge:c.value,suspect:s.value};if(!b.title)return alert('请输入案件名称');
 const r=await fetch('/api/cases',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});const j=await r.json();location='/case/'+j.case_id}</script>{% endblock %}

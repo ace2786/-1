@@ -40,6 +40,7 @@ async def generate(prompt: str, *, system: str | None = None, model: str | None 
 
     last_err = None
     for attempt in range(max_retries + 1):
+        _t0 = time.perf_counter()
         try:
             with _obs("llm." + model):
                 async with httpx.AsyncClient(timeout=timeout_s) as client:
@@ -49,7 +50,8 @@ async def generate(prompt: str, *, system: str | None = None, model: str | None 
                     out = r.json().get("response", "")
             Metrics.inc("llm_calls")
             Metrics.inc("llm_calls." + model)
-            audit("llm_generate", actor="system", model=model, attempt=attempt, ok=True)
+            audit("llm_generate", actor="system", model=model, attempt=attempt, ok=True,
+                  duration_s=round(time.perf_counter() - _t0, 2))
             return out
         except Exception as e:  # noqa: BLE001
             last_err = e
