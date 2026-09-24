@@ -2,6 +2,7 @@
 import hashlib, json, uuid
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request, Depends
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from ..config import settings
@@ -46,6 +47,37 @@ class FeedbackBody(BaseModel):
     answer: str
     rating: int          # 1 good / -1 bad
     correction: str = ""
+
+
+@app.get("/api/audit/history")
+async def audit_history(limit: int = 200, event: str = "", _=Depends(check_token)):
+    """Recent audit records across day files (newest first), optional event filter."""
+    files = sorted(Path(settings.audit_dir).glob("audit-*.jsonl"), reverse=True)
+    out = []
+    for f in files:
+        try:
+            lines = f.read_text(encoding="utf-8").splitlines()
+        except Exception:  # noqa: BLE001
+            continue
+        for ln in reversed(lines):
+            if len(out) >= limit:
+                break
+            try:
+                r = json.loads(ln)
+            except Exception:  # noqa: BLE001
+                continue
+            if event and r.get("event") != event:
+                continue
+            out.append(r)
+        if len(out) >= limit:
+            break
+    return {"count": len(out), "records": out}
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard_page():
+    html = (Path(__file__).parent.parent / "web" / "templates" / "dashboard.html").read_text(encoding="utf-8")
+    return HTMLResponse(html)
 
 
 @app.get("/api/health")

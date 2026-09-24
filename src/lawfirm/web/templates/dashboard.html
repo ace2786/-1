@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>可观测面板 · 律所办案辅助系统</title>
+<style>
+:root{--bg:#0f1420;--card:#171e2e;--ink:#e8ecf5;--mut:#8b96ad;--acc:#4f7cff;--ok:#31c48d;--warn:#f5a623;--bad:#ef4444}
+*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;background:var(--bg);color:var(--ink)}
+header{padding:14px 22px;background:#131a29;border-bottom:1px solid #232d45;display:flex;gap:16px;align-items:center}
+header a{color:var(--mut);text-decoration:none;font-size:14px}h1{font-size:17px;margin:0}
+main{max-width:1200px;margin:0 auto;padding:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid #232d45;border-radius:12px;padding:16px}
+.card h2{font-size:14px;color:var(--mut);margin:0 0 10px;font-weight:normal}
+.big{font-size:26px;font-weight:bold}
+table{width:100%;border-collapse:collapse;font-size:12.5px}th,td{padding:5px 8px;border-bottom:1px solid #232d45;text-align:left}
+.bar{height:8px;background:#232d45;border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
+#audit{grid-column:1/-1;max-height:420px;overflow:auto}
+.ev{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;background:#1c2a4d;color:#9fd0ff}
+.ev.llm_generate{background:#12321f;color:#7ee2b8}.ev.agent_tool_call{background:#33260f;color:#ffd08a}
+.ev.case_created,.ev.doc_uploaded{background:#1c2a4d;color:#9fd0ff}.ev.analysis_run{background:#2b1c3d;color:#d0aaff}
+.ts{color:var(--mut);font-size:11px;white-space:nowrap}
+.pulse{width:9px;height:9px;border-radius:50%;background:var(--ok);animation:p 2s infinite;margin-left:auto}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+select,input{background:#0d1220;border:1px solid #2a3550;color:var(--ink);border-radius:7px;padding:5px 8px;font-size:12.5px}
+</style></head><body>
+<header><a href="/">← 工作台</a><h1>📊 可观测面板</h1><span class="ts">自动刷新 5s</span><div class="pulse"></div></header>
+<main>
+ <div class="card"><h2>服务健康</h2><div id="health" class="big">…</div><div id="hver" class="ts"></div></div>
+ <div class="card"><h2>LLM 调用（本进程）</h2><div id="calls" class="big">0</div><div id="callbreak" class="ts"></div></div>
+ <div class="card"><h2>耗时分布（均值/最大·秒）</h2><table id="timers"></table></div>
+ <div class="card"><h2>今日审计事件统计</h2><table id="evstats"></table></div>
+ <div class="card" style="grid-column:1/-1"><h2>执行轨迹流水账（审计 JSONL · 只追加）
+   <select id="fev" onchange="loadAudit()" style="float:right"><option value="">全部事件</option></select>
+   <input id="fq" placeholder="过滤关键字…" style="float:right;width:160px;margin-right:8px" oninput="loadAudit()"></h2>
+   <table id="audit-t"><tr><th>时间</th><th>事件</th><th>案件</th><th>详情</th></tr></table></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+async function j(u){try{return await (await fetch(u)).json()}catch(e){return null}}
+async function loadHealth(){const h=await j('/api/health');if(!h)return $('health').textContent='不可达';
+ $('health').innerHTML=h.status==='ok'?'<span style=color:var(--ok)>● 正常</span>':'<span style=color:var(--warn)>● '+h.status+'</span>';
+ $('hver').textContent='Ollama '+(h.ollama||'')+''}
+async function loadMetrics(){const m=await j('/api/metrics');if(!m)return;
+ const c=m.counters||{};$('calls').textContent=c.llm_calls||0;
+ $('callbreak').textContent=Object.entries(c).filter(([k])=>k.startsWith('llm_calls.')).map(([k,v])=>`${k.slice(10)}:${v}`).join(' · ')||'';
+ const t=m.timers||{};$('timers').innerHTML='<tr><th>操作</th><th>次数</th><th>均值</th><th>最大</th><th></th></tr>'+
+  Object.entries(t).sort((a,b)=>b[1].n-a[1].n).slice(0,8).map(([k,v])=>`<tr><td>${k}</td><td>${v.n}</td><td>${v.avg_s}</td><td>${v.max_s}</td><td><div class="bar"><i style="width:${Math.min(100,v.max_s*4)}%"></i></div></td></tr>`).join('')}
+let ALL=[];
+async function loadAudit(){const a=await j('/api/audit/history?limit=300');if(!a)return;ALL=a.records;
+ const evs=[...new Set(ALL.map(r=>r.event))];if(!$('fev').options.length>1)$('fev').innerHTML='<option value="">全部事件</option>'+evs.map(e=>`<option>${e}</option>`).join('');
+ const ef=$('fev').value,q=$('fq').value.toLowerCase();
+ const rows=ALL.filter(r=>(!ef||r.event===ef)&&(!q||JSON.stringify(r).toLowerCase().includes(q))).slice(0,120);
+ $('audit-t').innerHTML='<tr><th>时间</th><th>事件</th><th>案件</th><th>详情</th></tr>'+rows.map(r=>{
+  const d={...r};delete d.ts;delete d.event;delete d.case_id;
+  return `<tr><td class="ts">${(r.ts||'').slice(11,19)}</td><td><span class="ev ${r.event}">${r.event}</span></td><td class="ts">${r.case_id||'-'}</td><td style="font-size:11.5px;color:var(--mut)">${JSON.stringify(d).slice(0,150)}</td></tr>`}).join('');
+ const st={};ALL.forEach(r=>st[r.event]=(st[r.event]||0)+1);
+ $('evstats').innerHTML='<tr><th>事件</th><th>次数</th></tr>'+Object.entries(st).sort((a,b)=>b[1]-a[1]).slice(0,9).map(([k,v])=>`<tr><td><span class="ev ${k}">${k}</span></td><td>${v}</td></tr>`).join('')}
+async function tick(){await Promise.all([loadHealth(),loadMetrics(),loadAudit()])}
+tick();setInterval(tick,5000);
+</script></body></html>

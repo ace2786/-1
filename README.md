@@ -62,7 +62,7 @@ src/lawfirm/
 - **高效性**：embedding 批量并发+信号量限流；numpy 内存向量库零服务依赖；分析按 key 增量运行
 - **稳定性**：LLM 调用自动重试；embedding 不可用时降级哈希向量；单文档解析失败不阻断整案
 - **安全性**：默认仅绑定 127.0.0.1；可选 X-API-Token 网关；上传白名单+大小限制+SHA-256存证；全程离线无外发
-- **可观测性**：`/api/metrics`(调用数/耗时分布)、`/api/audit/today`(每步留痕)、structlog JSON 日志
+- **可观测性**：**`/dashboard` 实时面板**（健康/LLM调用/耗时分布/事件统计/审计流水账，5s自刷新）、`/api/metrics`、`/api/audit/history?event=`(跨日检索+事件过滤)、structlog JSON 日志
 - **数据飞轮**：反馈接口沉淀修正样本 → 后续 few-shot 检索复用
 
 ## 📊 演示数据
