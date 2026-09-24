@@ -253,3 +253,14 @@
 {"ts": "2026-09-24T10:36:31.766642+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
 {"ts": "2026-09-24T10:36:31.768057+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
 {"ts": "2026-09-24T10:44:42.518463+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "故意伤害罪", "amount_yuan": 2.0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:49:36.413737+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:49:36.414324+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:53:35.811195+00:00", "event": "model_switch", "case_id": null, "actor": "user", "LAWFIRM_HEAVY_MODEL": "qwen3:1.7b"}
+{"ts": "2026-09-24T10:53:35.833033+00:00", "event": "model_switch", "case_id": null, "actor": "user", "LAWFIRM_HEAVY_MODEL": "qwen3:8b"}
+{"ts": "2026-09-24T10:53:57.673371+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T10:54:09.995246+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T10:54:21.663221+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T10:54:41.589044+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T10:55:01.681964+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T10:55:12.071452+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T10:56:31.287712+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}

@@ -1,18 +1,33 @@
 {% extends "base.html" %}{% block nav_set %}on{% endblock %}
 {% block body %}<h1>系统设置</h1>
-<div class="card"><h2>本地模型选择（两类）</h2>
-<table><tr><th>用途</th><th>当前模型</th><th>状态</th></tr>
-<tr><td>深度卷宗分析（高算力）</td><td><b>{{heavy}}</b></td><td>{% if heavy in st.have %}<span style="color:var(--ok)">✓ 已就绪</span>{% else %}<span style="color:var(--warn)">未下载：ollama pull {{heavy}}</span>{% endif %}</td></tr>
-<tr><td>轻量快速对话</td><td><b>{{light}}</b></td><td>{% if light in st.have %}<span style="color:var(--ok)">✓ 已就绪</span>{% else %}<span style="color:var(--warn)">未下载：ollama pull {{light}}</span>{% endif %}</td></tr>
-<tr><td>向量检索 Embedding</td><td><b>{{embed}}</b></td><td>{% if embed in st.have %}<span style="color:var(--ok)">✓ 已就绪</span>{% else %}<span style="color:var(--warn)">未下载：ollama pull {{embed}}</span>{% endif %}</td></tr></table>
-<p style="color:var(--mut);font-size:13px">切换方式：修改环境变量 LAWFIRM_HEAVY_MODEL / LAWFIRM_LIGHT_MODEL 后重启服务。所有推理均在本机完成，卷宗数据不出网。</p></div>
+<div class="card"><h2>本地模型路由 · 运行时切换</h2>
+<p style="font-size:13px;color:var(--mut)">从本机 Ollama 已安装模型中为三类任务指定模型，保存后立即生效并持久化到 lawfirm.local.env（重启不丢）。与银行私有化部署"按任务分池"同一思路。</p>
+<table><tr><th>用途</th><th>当前生效</th><th>切换为</th></tr>
+<tr><td>深度卷宗分析</td><td><b id="cur_heavy">{{heavy}}</b></td><td><select id="m_heavy"></select></td></tr>
+<tr><td>轻量快速对话</td><td><b id="cur_light">{{light}}</b></td><td><select id="m_light"></select></td></tr>
+<tr><td>向量检索 Embedding</td><td><b id="cur_embed">{{embed}}</b></td><td><select id="m_embed"></select></td></tr></table>
+<button onclick="saveModels()" style="margin-top:10px">💾 保存并生效</button>
+<span id="msave" style="font-size:12.5px;margin-left:10px"></span>
+{% if st.missing %}<p style="color:var(--warn);font-size:12.5px;margin-top:8px">提示：ollama pull {{st.missing|join(' / ollama pull ')}} 可扩充可选模型池</p>{% endif %}</div>
+
 <div class="card"><h2>安全与可观测性</h2><ul style="font-size:14px;line-height:2">
 <li>服务绑定：<b>{{s.bind_host}}:8000</b>（默认仅本机可访问；局域网演示需显式改 LAWFIRM_BIND_HOST）</li>
 <li>上传限制：单文件 <b>{{s.max_upload_mb}}MB</b>，类型白名单校验 + SHA-256 存证</li>
-<li>审计日志：data/audit/*.jsonl（每次 LLM 调用、工具执行、文档上传均留痕）→ <a href="/api/audit/today" style="color:var(--acc)">查看今日轨迹</a></li>
-<li>运行指标：/api/metrics（调用次数、耗时分布）</li></ul></div>
+<li>审计日志：data/audit/*.jsonl（每次 LLM 调用、工具执行、文档上传、模型切换均留痕）→ <a href="/dashboard" style="color:var(--acc)">📊 可观测面板</a></li>
+<li>运行指标：/api/metrics（调用数、耗时分布）· 跨日审计检索：/api/audit/history?event=llm_generate</li></ul></div>
+
 <div class="card"><h2>CLI / MCP 形态</h2><pre style="font-size:13px;line-height:1.8;color:var(--mut)">lawfirm cases                     # 命令行管理案件
-lawfirm ask "本案矛盾点?" --case-id xxx
-lawfirm mcp                       # 作为 MCP server 供智能体接入
-</pre></div>
+lawfirm ask "本案矛盾点?" b5e67f66ac70
+lawfirm mcp                       # 作为 MCP server 供智能体接入</pre></div>
+<script>
+async function loadInstalled(){const j=await (await fetch('/api/models/installed')).json();
+ const ms=j.models||[];const cur={m_heavy:'{{heavy}}',m_light:'{{light}}',m_embed:'{{embed}}'};
+ for(const el in cur){const sel=document.getElementById(el);sel.innerHTML='';
+  ms.forEach(m=>{sel.insertAdjacentHTML('beforeend',`<option value="${m}" ${m===cur[el]?'selected':''}>${m}</option>`)});
+  if(!ms.length)sel.innerHTML=`<option>${cur[el]}</option>`}}
+async function saveModels(){const body={heavy:m_heavy.value,light:m_light.value,embed:m_embed.value};
+ const r=await fetch('/api/models/set',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+ const j=await r.json();if(j.ok){msave.textContent='✓ 已切换：'+j.active.heavy+' / '+j.active.light;j.active&&Object.entries(j.active).forEach(([k,v])=>document.getElementById('cur_'+k).textContent=v)}else{msave.textContent='失败:'+JSON.stringify(j)}}
+loadInstalled();
+</script>
 {% endblock %}

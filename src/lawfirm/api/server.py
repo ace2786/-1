@@ -113,6 +113,50 @@ async def sentencing(body: SentencingBody):
         body.charge, body.amount_yuan, body.victims, body.factors)}
 
 
+class ModelSwitch(BaseModel):
+    heavy: str | None = None
+    light: str | None = None
+    embed: str | None = None
+
+
+@app.get("/api/models/installed")
+async def models_installed():
+    """List all models available on the local Ollama for switch dropdowns."""
+    import httpx
+    try:
+        async with httpx.AsyncClient(timeout=8) as c:
+            r = await c.get(settings.ollama_base_url + "/api/tags")
+        return {"models": [m["name"] for m in r.json().get("models", [])]}
+    except Exception as e:  # noqa: BLE001
+        return {"models": [], "error": str(e)[:120]}
+
+
+@app.post("/api/models/set", dependencies=[Depends(check_token)])
+async def models_set(body: ModelSwitch):
+    """Hot-switch routing targets at runtime (persisted to lawfirm.local.env)."""
+    changed = {}
+    for field_, val in (("heavy_model", body.heavy), ("light_model", body.light),
+                        ("embed_model", body.embed)):
+        if val:
+            setattr(settings, field_, val)
+            env_key = "LAWFIRM_" + field_.upper()
+            changed[env_key] = val
+    # persist so restarts keep the choice
+    envf = Path(__file__).resolve().parents[3] / "lawfirm.local.env"
+    lines = {}
+    if envf.exists():
+        for ln in envf.read_text(encoding="utf-8").splitlines():
+            if "=" in ln and not ln.strip().startswith("#"):
+                k, v = ln.split("=", 1)
+                lines[k.strip()] = v.strip()
+    lines.update(changed)
+    envf.write_text("\n".join(f"{k}={v}" for k, v in lines.items()) + "\n", encoding="utf-8")
+    audit("model_switch", actor="user", **changed)
+    Metrics.inc("model_switches")
+    return {"ok": True, "active": {"heavy": settings.heavy_model,
+            "light": settings.light_model, "embed": settings.embed_model}}
+
+
 @app.get("/api/metrics")
 async def metrics(_=Depends(check_token)):
     return Metrics.snapshot()
