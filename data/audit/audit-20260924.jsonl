@@ -94,3 +94,24 @@
 {"ts": "2026-09-24T06:24:14.553027+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 6.505, "error": null}
 {"ts": "2026-09-24T06:24:24.351848+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
 {"ts": "2026-09-24T06:24:24.352007+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 9.785, "error": null}
+{"ts": "2026-09-24T06:46:43.716655+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T06:46:43.720126+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 17.335, "error": null}
+{"ts": "2026-09-24T06:48:04.593173+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T06:48:04.593369+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 4.826, "error": null}
+{"ts": "2026-09-24T06:48:54.151743+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T06:48:54.151903+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 10.418, "error": null}
+{"ts": "2026-09-24T06:49:05.644757+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T06:49:05.644930+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 11.486, "error": null}
+{"ts": "2026-09-24T06:49:10.385602+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T06:49:10.385768+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 4.74, "error": null}
+{"ts": "2026-09-24T06:49:12.194359+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T06:49:12.194526+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 1.808, "error": null}
+{"ts": "2026-09-24T06:49:24.751727+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T06:49:24.759202+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 12.564, "error": null}
+{"ts": "2026-09-24T06:49:30.834685+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T06:49:30.834842+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 6.075, "error": null}
+{"ts": "2026-09-24T06:49:37.444534+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T06:49:37.444700+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 6.609, "error": null}
+{"ts": "2026-09-24T06:49:42.917060+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T06:49:42.917547+00:00", "event": "agent_final", "case_id": "248e7c69217f", "actor": "user", "question": "本案一共有多少处事实矛盾？", "steps": 1}
+{"ts": "2026-09-24T06:49:43.825567+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}

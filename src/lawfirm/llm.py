@@ -30,6 +30,8 @@ async def generate(prompt: str, *, system: str | None = None, model: str | None 
     if model is None:
         model = settings.heavy_model if heavy else settings.light_model
     body = {"model": model, "prompt": prompt, "stream": False,
+            # think:false -> qwen3 hybrid models skip CoT chain (fast + pure JSON out)
+            "think": False,
             "options": {"temperature": temperature}}
     if system:
         body["system"] = system
@@ -59,8 +61,16 @@ async def generate(prompt: str, *, system: str | None = None, model: str | None 
 
 
 async def generate_json(prompt: str, **kw):
-    """generate() with json_mode; tolerant of fenced/extra text."""
+    """generate() with json_mode; tolerant of fenced/extra text.
+
+    If the model returns an empty object/array (qwen3 sometimes does on long
+    structured prompts), retry once with a stricter instruction suffix.
+    """
     raw = await generate(prompt, json_mode=True, **kw)
+    _probe = raw.strip().replace(" ", "")
+    if _probe in ("{}", "{\"items\":[]}", "[]"):
+        raw = await generate(prompt + "\n\n（上次输出为空。请重新仔细审阅卷宗材料，必须给出非空结果；若确实无矛盾/无发现，也要在 items 里给出一条说明性条目。）",
+                             json_mode=True, **kw)
     s = raw.strip()
     if s.startswith("```"):
         parts = s.split("\n", 1)
