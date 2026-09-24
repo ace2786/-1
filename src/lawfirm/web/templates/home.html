@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block nav_home %}on{% endblock %}
+{% block body %}<h1>案件工作台</h1>
+<div class="card"><h2>新建案件</h2>
+<input id="t" placeholder="案件名称，如：张某某涉嫌非法吸收公众存款案" style="width:46%">
+<input id="c" placeholder="罪名" style="width:14%"><input id="s" placeholder="嫌疑人" style="width:12%">
+<button onclick="createCase()">生成案件表单</button></div>
+<div class="grid">{% for c in cases %}
+<a class="card" style="text-decoration:none;color:inherit" href="/case/{{c.case_id}}">
+<h1>{{c.title}}</h1><p><span class="tag">{{c.charge or '未填罪名'}}</span> <span class="tag">{{c.suspect or ''}}</span></p>
+<p style="color:var(--mut);font-size:13px">卷宗 {{c.docs|length}} 份 · 更新 {{c.updated_at[:10]}}</p></a>{% endfor %}</div>
+{% endblock %}{% block scripts %}<script>
+async function createCase(){const b={title:t.value,charge:c.value,suspect:s.value};if(!b.title)return alert('请输入案件名称');
+const r=await fetch('/api/cases',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});const j=await r.json();location='/case/'+j.case_id}</script>{% endblock %}

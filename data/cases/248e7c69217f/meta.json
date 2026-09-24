@@ -1,0 +1,66 @@
+{
+  "case_id": "248e7c69217f",
+  "title": "张某某涉嫌非法吸收公众存款案",
+  "charge": "非法吸收公众存款罪",
+  "suspect": "张某某",
+  "created_at": "2026-09-24T05:57:00.159975+00:00",
+  "updated_at": "2026-09-24T06:01:54.681367+00:00",
+  "docs": [
+    {
+      "doc_id": "207ec7f6a473",
+      "name": "doc1.txt",
+      "kind": "text",
+      "size": 267,
+      "sha256": "8ac97e700ca44707bf5301b7ba0a73f07bb1d28a0218e22a39ed134e6ef53377",
+      "uploaded_at": "2026-09-24T05:58:04.962608+00:00",
+      "pages": 1,
+      "status": "parsed",
+      "error": null
+    },
+    {
+      "doc_id": "fa17117f0f4a",
+      "name": "doc2.txt",
+      "kind": "text",
+      "size": 202,
+      "sha256": "2a11e42bcdd649a2c6ed65eae424922708f8dffc621d243d57183adff867e2c8",
+      "uploaded_at": "2026-09-24T05:58:04.999502+00:00",
+      "pages": 1,
+      "status": "parsed",
+      "error": null
+    },
+    {
+      "doc_id": "4fdbf8058ba5",
+      "name": "doc3.txt",
+      "kind": "text",
+      "size": 112,
+      "sha256": "183a0d5df6066f07f330562949fb91526d53422bb471e1dd30de140b844424f0",
+      "uploaded_at": "2026-09-24T05:58:05.014881+00:00",
+      "pages": 1,
+      "status": "parsed",
+      "error": null
+    },
+    {
+      "doc_id": "380c7d0ccd9b",
+      "name": "doc1.txt",
+      "kind": "text",
+      "size": 267,
+      "sha256": "8ac97e700ca44707bf5301b7ba0a73f07bb1d28a0218e22a39ed134e6ef53377",
+      "uploaded_at": "2026-09-24T06:01:54.642790+00:00",
+      "pages": 1,
+      "status": "parsed",
+      "error": null
+    },
+    {
+      "doc_id": "8ddea9ff1fa0",
+      "name": "doc2.txt",
+      "kind": "text",
+      "size": 202,
+      "sha256": "2a11e42bcdd649a2c6ed65eae424922708f8dffc621d243d57183adff867e2c8",
+      "uploaded_at": "2026-09-24T06:01:54.680969+00:00",
+      "pages": 1,
+      "status": "parsed",
+      "error": null
+    }
+  ],
+  "notes": ""
+}

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}律所办案辅助系统{% endblock %}</title>
+<style>
+:root{--bg:#0f1420;--card:#171e2e;--ink:#e8ecf5;--mut:#8b96ad;--acc:#4f7cff;--ok:#31c48d;--warn:#f5a623;--bad:#ef4444}
+*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans CJK SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink)}
+header{display:flex;gap:18px;padding:14px 22px;background:#131a29;border-bottom:1px solid #232d45;align-items:center}
+header a{color:var(--mut);text-decoration:none;font-size:14px}header a:hover,header a.on{color:var(--ink)}
+main{max-width:1280px;margin:0 auto;padding:22px}
+.card{background:var(--card);border:1px solid #232d45;border-radius:10px;padding:16px;margin-bottom:14px}
+button,.btn{background:var(--acc);border:0;color:#fff;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:14px}
+button.ghost{background:#232d45}input,select{background:#0d1220;border:1px solid #2a3550;color:var(--ink);padding:8px;border-radius:8px;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px;border-bottom:1px solid #232d45;text-align:left}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;background:#232d45;color:var(--mut)}
+.risk-高危{background:#3d1216;color:#ff8a8a}.risk-中风险{background:#3a2c10;color:#ffd08a}
+.cite{color:var(--acc);cursor:pointer;font-size:12px;border-bottom:1px dashed var(--acc)}
+#drawer{position:fixed;right:0;top:0;width:46%;height:100vh;background:#0b101c;border-left:1px solid #2a3550;transform:translateX(100%);transition:.25s;padding:18px;overflow:auto;z-index:9}
+#drawer.open{transform:none}
+.chat .msg{margin:8px 0;padding:10px;border-radius:8px;background:#0d1220}
+.chat .steps{font-size:12px;color:var(--mut)}
+h1{font-size:20px}h2{font-size:16px;color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+</style></head><body>
+<header><a href="/" class="{% block nav_home %}{% endblock %}">案件工作台</a>
+<a href="/settings" class="{% block nav_set %}{% endblock %}">系统设置</a>
+<span style="margin-left:auto;color:var(--mut);font-size:12px">离线本地大模型 · 卷宗不出本机</span></header>
+<main>{% block body %}{% endblock %}</main>
+<div id="drawer"><button class="ghost" onclick="drawer.close()">✕ 关闭</button><div id="drawer-body"></div></div>
+<script>
+const drawer={open(html){document.getElementById('drawer-body').innerHTML=html;document.getElementById('drawer').classList.add('open')},close(){document.getElementById('drawer').classList.remove('open')}};
+async function showChunk(caseId,chunkId){const r=await fetch(\/api/cases/\/chunk/\\);if(!r.ok){drawer.open('<p>无法定位原文（该引用缺少锚点）</p>');return}const c=await r.json();drawer.open(\<h2>\ · 第\页</h2><pre style="white-space:pre-wrap;font-size:13px;line-height:1.7">\</pre>\)}
+</script>{% block scripts %}{% endblock %}</body></html>

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block body %}<h1>{{case.title}}</h1><p><span class="tag">{{case.charge}}</span> <span class="tag">{{case.suspect}}</span></p>
+<div class="card"><h2>卷宗材料（PDF / 扫描卷宗 / Excel流水）</h2>
+<input type="file" id="f" multiple accept=".pdf,.txt,.md,.xlsx,.xls,.png,.jpg,.jpeg">
+<button onclick="upload()">上传并解析</button><span id="upmsg" style="color:var(--mut)"></span>
+<table id="docs"><tr><th>文件</th><th>类型</th><th>页数</th><th>状态</th></tr>
+{% for d in case.docs %}<tr><td>{{d.name}}</td><td>{{d.kind}}</td><td>{{d.pages}}</td><td>{{d.status}} {{d.error or ''}}</td></tr>{% endfor %}</table></div>
+<div class="card"><button onclick="analyzeAll()" id="anaBtn">全部分析</button>
+<span style="color:var(--mut);font-size:13px">调用本地深度模型：{{models.heavy}}</span><div id="anaprogress"></div></div>
+<div class="card"><h2>分析报告</h2><div id="reports">
+{% set labels={'evidence':'证据要点','timeline':'案件时间线','contradictions':'矛盾排查','irrelevant':'无效材料过滤','summary':'卷宗摘要','trial_strategy':'庭审思路','bank_flow':'银行流水专项分析'} %}
+{% for k in analysis_keys %}{% set a=analyses.get(k) %}<details {% if k=='evidence' %}open{% endif %}><summary><b>{{labels[k]}}</b> {% if a %}<span class="tag">已生成</span>{% else %}<span class="tag">未生成</span>{% endif %}</summary>
+<div id="r-{{k}}" data-key="{{k}}">{% if a %}<em style="color:var(--mut)">加载中…</em>{% else %}<em style="color:var(--mut)">点击「全部分析」生成</em>{% endif %}</div></details>{% endfor %}</div></div>
+<div class="card chat"><h2>AI助手（上下文锁定本页 · 自主工具调用）</h2>
+<input id="q" placeholder="例如：本案一共有多少处事实矛盾？" style="width:60%"><button onclick="ask()">提问</button>
+<label style="font-size:12px;color:var(--mut)"><input type="checkbox" id="heavy"> 用深度模型回答</label>
+<div id="chatlog"></div></div>
+{% endblock %}
+{% block scripts %}<script>
+const CID="{{case.case_id}}";
+const KEYLABEL={focuses:'争议焦点',cross_exam:'质证要点',defense_lines:'辩护方向',risks:'风险提示'};
+function esc(s){return (s||'').replace(/</g,'&lt;')}
+function cite(c){if(!c.chunk_id)return `<span class="cite">${esc(c.doc_name)}·P${c.page}</span>`;return `<span class="cite" onclick="showChunk(CID,'${c.chunk_id}')">${esc(c.doc_name)}·P${c.page} ↗</span>`}
+function render(key,a){if(!a)return '<em>无</em>';let h='';
+ if(key==='evidence'){(a.items||[]).forEach(i=>{h+=`<div class="card"><span class="tag">${i.type}</span> <b>${esc(i.title)}</b><p>${esc(i.detail)}</p><p>${(i.citations||[]).map(cite).join(' ')}</p></div>`})}
+ else if(key==='timeline'){h='<table><tr><th>时间</th><th>事件</th><th>意义</th><th>来源</th></tr>';(a.items||[]).forEach(i=>{h+=`<tr><td>${esc(i.date)}</td><td>${esc(i.event)}</td><td>${esc(i.significance)}</td><td>${(i.citations||[]).map(cite).join(' ')}</td></tr>`});h+='</table>'}
+ else if(key==='contradictions'){(a.items||[]).forEach((i,n)=>{h+=`<div class="card"><span class="tag risk-${i.risk}">${i.risk}</span> <b>${esc(i.topic)}</b><p>A：<span class="cite" onclick="jumpDoc('${esc(i.claim_a.source_doc)}',${i.claim_a.page})">「${esc(i.claim_a.text)}」</span> — ${esc(i.claim_a.source_doc)}·P${i.claim_a.page}</p><p>B：<span class="cite" onclick="jumpDoc('${esc(i.claim_b.source_doc)}',${i.claim_b.page})">「${esc(i.claim_b.text)}」</span> — ${esc(i.claim_b.source_doc)}·P${i.claim_b.page}</p><p style="color:var(--mut)">${esc(i.analysis)}</p></div>`})}
+ else if(key==='irrelevant'){h='<ul>'+(a.items||[]).map(i=>`<li><b>${esc(i.doc_name)}</b> — ${esc(i.reason)}</li>`).join('')+'</ul>'}
+ else if(key==='summary'){h=`<p><b>当事人：</b>${esc(a.parties)}</p><p>${esc(a.overview)}</p><p><b>涉案金额：</b>${esc(a.amount)}</p><ul>${(a.key_points||[]).map(p=>'<li>'+esc(p)+'</li>').join('')}</ul><p>${(a.citations||[]).map(cite).join(' ')}</p>`}
+ else if(key==='trial_strategy'){h=['focuses','cross_exam','defense_lines','risks'].map(k=>`<p><b>${KEYLABEL[k]}</b></p><ul>${(a[k]||[]).map(x=>'<li>'+esc(x)+'</li>').join('')}</ul>`).join('')}
+ else if(key==='bank_flow'){h=`<p>期间：${esc(a.period)}　流入:${esc(a.total_in)}　流出:${esc(a.total_out)}</p><ul>${(a.anomalies||[]).map(x=>'<li><b>'+esc(x.desc)+'</b> '+esc(x.evidence)+'</li>').join('')}</ul><p>${esc(a.conclusion)}</p>`}
+ return h||'<em>空</em>'}
+function jumpDoc(name,page){drawer.open('<p>正在定位 '+name+' 第'+page+'页…</p>');fetch('/api/cases/'+CID+'/search?q='+encodeURIComponent(String(name).slice(0,8))+'&k=10').then(r=>r.json()).then(rs=>{const hit=rs.find(r=>r.doc_name===name&&r.page==page)||rs[0];if(hit)showChunk(CID,hit.chunk_id);else drawer.open('<p>未找到该页锚点</p>')})}
+async function upload(){const fs=f.files;if(!fs.length)return;upmsg.textContent='上传解析中…';
+ for(const file of fs){const fd=new FormData();fd.append('file',file);
+ const r=await fetch('/api/cases/'+CID+'/documents',{method:'POST',body:fd});const j=await r.json();
+ upmsg.textContent=file.name+' → '+(j.status||'失败')+' pages='+(j.pages||0)+' chunks='+(j.chunks||0)+(j.error?(' '+j.error):'');if(fs.length>1)await new Promise(s=>setTimeout(s,400))}
+ setTimeout(()=>location.reload(),900)}
+async function analyzeAll(){anaBtn.disabled=true;const keys=['evidence','timeline','contradictions','irrelevant','summary','trial_strategy','bank_flow'];
+ for(const k of keys){anaprogress.textContent='正在生成：'+k+' …（深度模型，请稍候）';try{const r=await fetch('/api/cases/'+CID+'/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:k})});const a=await r.json();document.getElementById('r-'+k).innerHTML=render(k,a);}catch(e){anaprogress.textContent=k+' 失败:'+e}}}
+ anaBtn.disabled=false;anaprogress.textContent='✅ 全部分析完成'}
+async function ask(){if(!q.value.trim())return;const t=q.value;q.value='';
+ chatlog.insertAdjacentHTML('beforeend','<div class="msg"><b>我：</b>'+esc(t)+'</div>');
+ chatlog.insertAdjacentHTML('beforeend','<div class="msg" id="typing">🤖 思考中（ReAct循环+工具调用）…</div>');
+ const openEl=document.querySelector('#reports details[open] > div[id]');const pageCtx=openEl?openEl.innerText.slice(0,2500):'';
+ const r=await fetch('/api/cases/'+CID+'/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:t,page_context:pageCtx,heavy:heavy.checked})});
+ const j=await r.json();document.getElementById('typing')?.remove();
+ const steps=j.steps.map(s=>s.type=='tool'?('🔧 '+s.action+' '+JSON.stringify(s.input)):('✅ 得出结论')).join('<br>');
+ chatlog.insertAdjacentHTML('beforeend','<div class="msg"><b>AI：</b>'+esc(j.answer).replace(/\n/g,'<br>')+'<div class="steps">执行轨迹:<br>'+steps+'</div></div>')}
+window.addEventListener('load',()=>{fetch('/api/cases/'+CID+'/analyses').then(r=>r.json()).then(all=>{document.querySelectorAll('#reports div[data-key]').forEach(el=>{const k=el.dataset.key;if(all[k])el.innerHTML=render(k,all[k])})})});
+</script>{% endblock %}

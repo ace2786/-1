@@ -1,0 +1,11 @@
+{"ts": "2026-09-24T05:56:36.594040+00:00", "event": "case_created", "case_id": "4244c99abe02", "actor": "user", "title": "张某某涉嫌非法吸收公众存款案"}
+{"ts": "2026-09-24T05:57:00.161178+00:00", "event": "case_created", "case_id": "248e7c69217f", "actor": "user", "title": "张某某涉嫌非法吸收公众存款案"}
+{"ts": "2026-09-24T05:58:04.962981+00:00", "event": "doc_parsed", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 0.0, "error": null}
+{"ts": "2026-09-24T05:58:04.999910+00:00", "event": "doc_parsed", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 0.0, "error": null}
+{"ts": "2026-09-24T05:58:05.015179+00:00", "event": "doc_parsed", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 0.0, "error": null}
+{"ts": "2026-09-24T06:01:54.643148+00:00", "event": "doc_parsed", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 0.0, "error": null}
+{"ts": "2026-09-24T06:01:54.671375+00:00", "event": "embed_fallback", "case_id": null, "actor": "system", "error": "embed failed: {\"error\":\"model \\\"nomic-embed-text:v1.5\\\" not found, try pulling it first\"}"}
+{"ts": "2026-09-24T06:01:54.672953+00:00", "event": "doc_uploaded", "case_id": "248e7c69217f", "actor": "user", "doc": "doc1.txt", "sha256": "8ac97e700ca4", "chunks": 4}
+{"ts": "2026-09-24T06:01:54.681246+00:00", "event": "doc_parsed", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 0.0, "error": null}
+{"ts": "2026-09-24T06:01:54.690586+00:00", "event": "doc_uploaded", "case_id": "248e7c69217f", "actor": "user", "doc": "doc2.txt", "sha256": "2a11e42bcdd6", "chunks": 5}
+{"ts": "2026-09-24T06:03:00.123231+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
