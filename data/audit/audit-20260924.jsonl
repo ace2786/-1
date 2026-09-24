@@ -264,3 +264,17 @@
 {"ts": "2026-09-24T10:55:01.681964+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
 {"ts": "2026-09-24T10:55:12.071452+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
 {"ts": "2026-09-24T10:56:31.287712+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T12:03:01.740288+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:03:01.741459+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:03:38.145586+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:03:38.146315+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:03:44.426877+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:03:44.428085+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T12:04:22.815956+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T12:04:23.650130+00:00", "event": "agent_tool_call", "case_id": "32db993ed208", "actor": "user", "action": "search_case", "input": {"query": "王某 醉酒驾驶 事实矛盾"}, "observation_len": 585}
+{"ts": "2026-09-24T12:04:25.485693+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T12:04:25.485850+00:00", "event": "agent_final", "case_id": "32db993ed208", "actor": "user", "question": "有多少事实矛盾的地方", "steps": 2}
+{"ts": "2026-09-24T12:08:07.612028+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T12:08:07.619843+00:00", "event": "agent_tool_call", "case_id": "952c5a2c1357", "actor": "user", "action": "get_analysis", "input": {"key": "contradictions"}, "observation_len": 1370}
+{"ts": "2026-09-24T12:08:08.980876+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T12:08:08.981045+00:00", "event": "agent_final", "case_id": "952c5a2c1357", "actor": "user", "question": "本案一共有多少处事实矛盾？", "steps": 2}

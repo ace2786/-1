@@ -152,6 +152,14 @@ async function analyzeAll(){anaBtn.disabled=true;const keys=['evidence','timelin
 function paint(k,a){const el=document.getElementById('r-'+k);el.innerHTML=render(k,a);const dot=document.getElementById('dot-'+k);if(dot)(Array.isArray(a.items)?a.items.length:Object.keys(a||{}).length)>0&&dot.classList.add('has')}
 function showTab(k){curTab=k;document.querySelectorAll('.rtab').forEach(b=>b.classList.toggle('on',b.dataset.k===k));document.querySelectorAll('.rpane').forEach(p=>p.style.display=p.dataset.key===k?'block':'none')}
 /* ---------- chat ---------- */
+function fmtAnswer(txt){const lines=(txt||'').split(/\n+/).filter(x=>x.trim());let html='';
+ for(let ln of lines){ln=ln.replace(/【来源[:：]([^】]+)】/g,(m,ref)=>{const mm=ref.match(/^(.*?)[·\s]*第?(\d+)页?$/);
+   const name=mm?mm[1].trim():ref.trim(),pg=mm?+mm[2]:1;
+   return ` <span class="cite" style="font-size:12px" onclick="jumpDoc('${esc(name)}',${pg},'')">📄 ${esc(ref)}</span>`});
+  let t=esc(ln).replace(/^\s*(?:\d+[\.、]|[-•])\s*/,'');
+  const isNum=/^\s*(?:\d+[\.、]|[-•])/.test(ln);
+  html+=isNum?`<div style="display:flex;gap:8px;margin:7px 0"><span style="color:var(--acc);font-weight:bold;flex:none">▸</span><span>${t}</span></div>`:`<div style="margin:7px 0">${t}</div>`}
+ return html}
 async function ask(){if(!q.value.trim())return;const t=q.value;q.value='';
  chatlog.insertAdjacentHTML('beforeend',`<div class="msg user"><b>我：</b>${esc(t)}</div>`);
  const ph=document.createElement('div');ph.className='msg';ph.id='typing';ph.textContent='🤖 思考中（ReAct+工具调用）…';chatlog.appendChild(ph);
@@ -159,7 +167,7 @@ async function ask(){if(!q.value.trim())return;const t=q.value;q.value='';
  const r=await fetch('/api/cases/'+CID+'/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:t,page_context:pageCtx,heavy:heavy.checked})});
  const j=await r.json();ph.remove();
  const steps=(j.steps||[]).map(s=>s.type=='tool'?('🔧 '+s.action+' '+JSON.stringify(s.input)):('✅ 得出结论')).join('\n');
- chatlog.insertAdjacentHTML('beforeend',`<div class="msg"><b>AI：</b>${esc(j.answer)}<div class="steps">执行轨迹：\n${esc(steps)}</div></div>`);chatlog.scrollTop=chatlog.scrollHeight}
+ chatlog.insertAdjacentHTML('beforeend',`<div class="msg" style="background:#131a29;border:1px solid var(--acc);border-left:4px solid var(--acc)"><b style="color:var(--acc)">🤖 AI 助手</b><div style="margin-top:6px;font-size:14px;line-height:1.9">${fmtAnswer(j.answer)}</div><details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--mut)">🔍 查看执行轨迹（${j.steps.length}步工具调用）</summary><div class="steps" style="white-space:pre-wrap">${esc(steps)}</div></details></div>`);chatlog.scrollTop=chatlog.scrollHeight}
 q.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask()}});
 /* ---------- boot ---------- */
 window.addEventListener('load',async()=>{await loadDocs();
