@@ -45,8 +45,14 @@ async def ask(question: str, case_id: str, page_context: str | None = None,
              '（系统提示：必须先至少调用一次工具获取事实，禁止跳过工具直接给 Final Answer）']
     if page_context:
         convo.insert(0, f'当前页面上下文摘要：\n{page_context[:3000]}')
+    from . import flywheel
+    memories = await flywheel.recall(question, k=3)
     steps: list[Step] = []
     trace = []
+    if memories:
+        guide = "\n".join(f"- 关于『{m['question'][:40]}』，专家纠正：{m['correction'][:160]}" for m in memories)
+        convo.append("历史经验（先前人工纠正，必须遵循）：\n" + guide)
+
     sys_prompt = REACT_SYSTEM.format(tool_specs=specs)
 
     for i in range(max_steps):
@@ -59,7 +65,7 @@ async def ask(question: str, case_id: str, page_context: str | None = None,
             trace.append({"step": i + 1, "type": "final", "thought": thought})
             audit("agent_final", case_id=case_id, question=question, steps=i + 1)
             Metrics.inc("agent_answers")
-            return {"answer": final.strip(), "steps": trace}
+            return {"answer": final.strip(), "steps": trace, "used_memories": memories}
         action = _extract(out, "Action:")
         raw_in = _extract(out, "Action Input:")
         if not action:
@@ -84,7 +90,7 @@ async def ask(question: str, case_id: str, page_context: str | None = None,
     final = _extract(out, "Final Answer:") or out
     trace.append({"step": len(trace) + 1, "type": "forced_final"})
     audit("agent_forced_final", case_id=case_id, question=question)
-    return {"answer": final.strip(), "steps": trace}
+    return {"answer": final.strip(), "steps": trace, "used_memories": memories}
 
 
 def _extract(text: str, marker: str) -> str | None:

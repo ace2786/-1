@@ -175,13 +175,13 @@ async function ask(){const big=document.getElementById('stage').style.display===
  const src=big?document.getElementById('stage-q'):q;const t=(src.value||'').trim();if(!t)return;
  q.value='';const sq=document.getElementById('stage-q');sq.value='';
  const both=h=>{chatlog.insertAdjacentHTML('beforeend',h);const sl=document.getElementById('stage-log');sl.insertAdjacentHTML('beforeend',h);sl.scrollTop=sl.scrollHeight;chatlog.scrollTop=chatlog.scrollHeight};
- both(`<div class="msg user" style="border-left:4px solid #2a3550"><b>👤 我：</b>${esc(t)}</div>`);
+ LASTQ=t;both(`<div class="msg user" style="border-left:4px solid #2a3550"><b>👤 我：</b>${esc(t)}</div>`);
  const pid='tp'+Date.now();both(`<div class="msg" id="${pid}" style="color:var(--mut)">🤖 思考中（ReAct循环+工具调用）…</div>`);
  const openEl=document.getElementById('r-'+curTab);const pageCtx=openEl?openEl.innerText.slice(0,2500):'';
  let j;try{j=await (await fetch('/api/cases/'+CID+'/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:t,page_context:pageCtx,heavy:(big?document.getElementById('stage-heavy'):document.getElementById('heavy')).checked})})).json()}catch(e){document.querySelectorAll('[id^="tp"]').forEach(x=>x.remove());both('<div class="msg" style="color:var(--bad)">请求失败:'+esc(String(e))+'</div>');return}
  document.querySelectorAll('[id^="tp"]').forEach(x=>x.remove());
  const steps=(j.steps||[]).map(s=>s.type=='tool'?('🔧 '+s.action+' '+JSON.stringify(s.input)):('✅ 得出结论')).join('\n');
- both(`<div class="msg" style="background:#131a29;border:1px solid var(--acc);border-left:4px solid var(--acc)"><b style="color:var(--acc)">🤖 AI 助手</b><div style="margin-top:6px;font-size:14.5px;line-height:2">${fmtAnswer(j.answer)}</div><details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--mut)">🔍 查看执行轨迹（${j.steps.length}步工具调用）</summary><div class="steps" style="white-space:pre-wrap">${esc(steps)}</div></details></div>`)}
+ both(`<div class="msg" style="background:#131a29;border:1px solid var(--acc);border-left:4px solid var(--acc)"><b style="color:var(--acc)">🤖 AI 助手</b><div style="margin-top:6px;font-size:14.5px;line-height:2">${fmtAnswer(j.answer)}</div><details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--mut)">🔍 查看执行轨迹（${j.steps.length}步工具调用）</summary><div class="steps" style="white-space:pre-wrap">${esc(steps)}</div></details><div style="display:flex;gap:8px;margin-top:8px;align-items:center">${(j.used_memories&&j.used_memories.length)?`<span style="font-size:11.5px;color:var(--ok)">📚 参考了${j.used_memories.length}条历史经验</span>`:`<span style="font-size:11.5px;color:var(--mut)">📚 暂无相关历史经验</span>`}<button class="ghost" style="margin-left:auto;font-size:12px;padding:3px 10px" onclick="fb(this,'+1',this.dataset.q)">👍</button><button class="ghost" style="font-size:12px;padding:3px 10px" onclick="fb(this,-1)">👎</button></div></div>`)}
 q.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask()}});
 /* ---------- boot ---------- */
 window.addEventListener('load',async()=>{await loadDocs();
@@ -202,4 +202,10 @@ window.addEventListener('load',()=>{fetch('/api/sentencing',{method:'POST',heade
 function chatStage(on){document.getElementById('stage').style.display=on?'block':'none';if(on)setTimeout(()=>document.getElementById('stage-q').focus(),50)}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')chatStage(false)});
 document.getElementById('stage-q').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask()}});
+
+let LASTQ='';
+async function fb(btn,rating){const card=btn.closest('.msg');const ansEl=card.querySelector('div[style*="line-height"]');const a=ansEl?ansEl.innerText.slice(0,600):'';
+ let corr='';if(rating===-1){corr=prompt('请写出正确答案（将作为历史经验被系统永久记住并在同类问题中遵循）：')||'';if(!corr)return}
+ const r=await fetch('/api/cases/'+CID+'/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:LASTQ,answer:a,rating,correction:corr})});
+ const j=await r.json();if(j.saved){const tip=document.createElement('div');tip.style.cssText='font-size:11.5px;color:var(--ok);margin-top:6px';tip.textContent=rating===1?'✓ 已记录满意':'✓ 纠正已存入飞轮，下次同类问题将自动遵循';card.appendChild(tip)}}
 </script>{% endblock %}

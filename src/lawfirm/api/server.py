@@ -290,11 +290,8 @@ async def ask_ep(case_id: str, body: AskBody):
 @app.post("/api/cases/{case_id}/feedback", dependencies=[Depends(check_token)])
 async def feedback(case_id: str, body: FeedbackBody):
     """Data flywheel: store ratings & corrections for few-shot retrieval later."""
-    from ..rag.store import _case_dir as cd
-    fp = cd(case_id) / "flywheel.jsonl"
-    rec = body.model_dump(); rec["ts"] = __import__("datetime").datetime.now().isoformat()
-    with open(fp, "a", encoding="utf-8") as f:
-        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    from ..agents.flywheel import record
+    record(case_id, body.question, body.answer, body.rating, body.correction)
     audit("feedback_recorded", case_id=case_id, rating=body.rating)
     return {"saved": True}
 
