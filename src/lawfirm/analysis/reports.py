@@ -146,13 +146,48 @@ def _fix_citations(payload, used_chunks):
     return payload
 
 
+_FLOW_NAME_KW = ("流水", "交易明细", "银行", "账户")
+
+
+def _has_tabular(case_id: str, case) -> bool:
+    """True if any xlsx doc, or a text/pdf doc whose content looks like bank flow."""
+    import json as _json
+    from ..rag.store import _case_dir as cd
+    for d in case.docs:
+        if d.get("kind") == "xlsx":
+            return True
+    # name-based heuristic for text exports of statements
+    if any(any(k in d.get("name", "") for k in _FLOW_NAME_KW) for d in case.docs):
+        return True
+    # content probe on parsed text (tab-separated header or 收/支 columns)
+    base = cd(case_id) / "documents"
+    for tj in base.glob("*.text.json"):
+        try:
+            data = _json.loads(tj.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            continue
+        for pg in data.get("pages", [])[:2]:
+            head = pg.get("text", "")[:400]
+            if ("\t" in head and ("金额" in head or "余额" in head)) or                ("交易日期" in head and ("收入" in head or "支出" in head)):
+                return True
+    return False
+
+
 async def run_analysis(case_id: str, key: str, *, heavy: bool = True) -> dict:
     assert key in ANALYSIS_KEYS
     case = load_case(case_id)
+    if key == "bank_flow" and not _has_tabular(case_id, case):
+        save_analysis(case_id, key, {"applicable": False,
+                     "conclusion": "本案卷宗中无银行流水类表格文件（xlsx/xls），流水专项分析不适用。",
+                     "anomalies": [], "counterparties": []})
+        return {"applicable": False, "conclusion": "本案无银行流水材料，已跳过流水专项分析。",
+                "anomalies": [], "counterparties": []}
     material, used = _material(case_id)
     if not material.strip():
         return {"items": [], "error": "该案卷尚无已解析文本，请先上传并解析材料"}
     hint = ""
+    if key == "bank_flow":
+        hint += "\n仅分析表格类流水文件中出现的数据；摘要/笔录等非表格材料只能作为背景引用，不得把饭店、场所等当作交易对手方。"
     if key in ("summary", "trial_strategy", "bank_flow"):
         hint = "\n注意：顶层JSON对象的每个字段都必须填写（没有信息就填空字符串或空数组），items不是这些键的返回结构。"
     doc_names = sorted({c["doc_name"] for c in used})

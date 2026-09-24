@@ -236,3 +236,13 @@
 {"ts": "2026-09-24T09:59:13.184243+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "敏害伤害氏", "amount_yuan": 1.0, "victims": 0, "factors": ["guilty_plea", "restitution"]}
 {"ts": "2026-09-24T09:59:35.197187+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "故意伤害罪", "amount_yuan": 1.0, "victims": 0, "factors": ["guilty_plea", "restitution"]}
 {"ts": "2026-09-24T09:59:35.215746+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "故意伤害罪", "amount_yuan": 2.0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:02:15.063953+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:02:15.066361+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:02:39.570098+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:02:39.570704+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T10:04:30.977591+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T10:04:30.981142+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 28.435, "error": null}
+{"ts": "2026-09-24T10:05:12.400232+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T10:05:12.401327+00:00", "event": "analysis_run", "case_id": "952c5a2c1357", "actor": "user", "status": "ok", "duration_s": 8.535, "error": null}
+{"ts": "2026-09-24T10:05:29.107220+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T10:05:29.107398+00:00", "event": "analysis_run", "case_id": "c282e8e398fe", "actor": "user", "status": "ok", "duration_s": 16.683, "error": null}
