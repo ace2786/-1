@@ -32,4 +32,4 @@ build-backend = "hatchling.build"
 packages = ["src/lawfirm"]
 
 [project.scripts]
-lawfirm = "lawfirm.cli.main:app"
+lawfirm = "lawfirm.cli.main:app"pillow>=10.0

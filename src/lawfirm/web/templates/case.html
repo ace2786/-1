@@ -1,51 +1,153 @@
 {% extends "base.html" %}
-{% block body %}<h1>{{case.title}}</h1><p><span class="tag">{{case.charge}}</span> <span class="tag">{{case.suspect}}</span></p>
-<div class="card"><h2>卷宗材料（PDF / 扫描卷宗 / Excel流水）</h2>
-<input type="file" id="f" multiple accept=".pdf,.txt,.md,.xlsx,.xls,.png,.jpg,.jpeg">
-<button onclick="upload()">上传并解析</button><span id="upmsg" style="color:var(--mut)"></span>
-<table id="docs"><tr><th>文件</th><th>类型</th><th>页数</th><th>状态</th></tr>
-{% for d in case.docs %}<tr><td>{{d.name}}</td><td>{{d.kind}}</td><td>{{d.pages}}</td><td>{{d.status}} {{d.error or ''}}</td></tr>{% endfor %}</table></div>
-<div class="card"><button onclick="analyzeAll()" id="anaBtn">全部分析</button>
-<span style="color:var(--mut);font-size:13px">调用本地深度模型：{{models.heavy}}</span><div id="anaprogress"></div></div>
-<div class="card"><h2>分析报告</h2><div id="reports">
-{% set labels={'evidence':'证据要点','timeline':'案件时间线','contradictions':'矛盾排查','irrelevant':'无效材料过滤','summary':'卷宗摘要','trial_strategy':'庭审思路','bank_flow':'银行流水专项分析'} %}
-{% for k in analysis_keys %}{% set a=analyses.get(k) %}<details {% if k=='evidence' %}open{% endif %}><summary><b>{{labels[k]}}</b> {% if a %}<span class="tag">已生成</span>{% else %}<span class="tag">未生成</span>{% endif %}</summary>
-<div id="r-{{k}}" data-key="{{k}}">{% if a %}<em style="color:var(--mut)">加载中…</em>{% else %}<em style="color:var(--mut)">点击「全部分析」生成</em>{% endif %}</div></details>{% endfor %}</div></div>
-<div class="card chat"><h2>AI助手（上下文锁定本页 · 自主工具调用）</h2>
-<input id="q" placeholder="例如：本案一共有多少处事实矛盾？" style="width:60%"><button onclick="ask()">提问</button>
-<label style="font-size:12px;color:var(--mut)"><input type="checkbox" id="heavy"> 用深度模型回答</label>
-<div id="chatlog"></div></div>
+{% block body %}
+<div class="layout">
+  <!-- ===== left rail: documents ===== -->
+  <aside class="rail">
+    <div class="rail-h">📁 {{case.title}}</div>
+    <div class="rail-sub">{{case.charge}} · {{case.suspect}}</div>
+    <div class="upbox">
+      <input type="file" id="f" multiple accept=".pdf,.txt,.md,.xlsx,.xls,.png,.jpg,.jpeg" style="width:100%;font-size:12px">
+      <button onclick="upload()" style="width:100%;margin-top:6px">上传卷宗</button>
+      <div id="upmsg" style="font-size:11.5px;color:var(--mut);margin-top:4px"></div>
+    </div>
+    <div class="docs">
+      {% for d in case.docs %}
+      <div class="doc" data-doc="{{d.doc_id}}" onclick="selectDoc('{{d.doc_id}}')">
+        <span class="di">{{ {'pdf':'📄','text':'📃','xlsx':'📊','image':'🖼️'}.get(d.kind,'📎') }}</span>
+        <div class="dn">{{d.name}}<div class="dm">{{d.pages}}页 · {{d.status}}{% if d.error %} ⚠{% endif %}</div></div>
+      </div>{% endfor %}
+      {% if not case.docs %}<div style="color:var(--mut);font-size:13px;padding:8px">还没有卷宗，先上传</div>{% endif %}
+    </div>
+    <div style="margin-top:auto;display:flex;gap:8px">
+      <button id="anaBtn" onclick="analyzeAll()" style="flex:1">⚡ 全部分析</button>
+    </div>
+    <div id="anaprogress" style="font-size:11.5px;color:var(--warn);min-height:16px;margin-top:6px"></div>
+  </aside>
+
+  <!-- ===== center: viewer + reports ===== -->
+  <section class="center">
+    <div class="viewpane card" id="viewpane">
+      <div class="vh"><b id="vtitle">卷宗预览</b><span id="vmeta" style="color:var(--mut);font-size:12px;margin-left:10px"></span></div>
+      <div id="viewer"><em style="color:var(--mut)">点击左侧卷宗查看内容；图片卷宗支持直接浏览原图</em></div>
+    </div>
+    <div class="card" style="padding-bottom:6px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <b style="font-size:15px">分析报告</b>
+        <span id="rmeta" style="color:var(--mut);font-size:12px"></span>
+      </div>
+      <div class="tabs" id="rtabs">
+        {% set labels={'evidence':'证据要点','timeline':'时间线','contradictions':'矛盾排查','irrelevant':'无效材料','summary':'卷宗摘要','trial_strategy':'庭审思路','bank_flow':'流水专项'} %}
+        {% for k,lb in labels.items() %}<button class="rtab{% if loop.first %} on{% endif %}" data-k="{{k}}" onclick="showTab('{{k}}')">{{lb}}<i class="rdot" id="dot-{{k}}"></i></button>{% endfor %}
+      </div>
+      <div id="reports">
+        {% for k in labels.keys() %}<div class="rpane" id="r-{{k}}" data-key="{{k}}" style="display:none"><em style="color:var(--mut)">未生成 — 点左上「全部分析」</em></div>{% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== right: assistant ===== -->
+  <aside class="chatpane">
+    <div class="ch">🤖 AI助手 <span style="font-size:11px;color:var(--mut)">· 上下文锁定本页</span></div>
+    <div id="chatlog" class="cbody"></div>
+    <div class="cfoot">
+      <textarea id="q" rows="2" placeholder="例如：本案一共有多少处事实矛盾？" style="width:100%;resize:none;background:#0d1220;border:1px solid #2a3550;color:var(--ink);border-radius:8px;padding:8px;font-size:13px"></textarea>
+      <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
+        <button onclick="ask()" style="flex:1">提问</button>
+        <label style="font-size:11.5px;color:var(--mut)"><input type="checkbox" id="heavy">深度模型</label>
+      </div>
+    </div>
+  </aside>
+</div>
 {% endblock %}
-{% block scripts %}<script>
+{% block scripts %}<style>
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr) 340px;gap:14px;height:calc(100vh - 90px)}
+.rail{background:var(--card);border:1px solid #232d45;border-radius:12px;padding:14px;display:flex;flex-direction:column;overflow:hidden}
+.rail-h{font-weight:bold;font-size:15px;line-height:1.4}
+.rail-sub{color:var(--mut);font-size:12px;margin:2px 0 10px}
+.upbox{border:1px dashed #2a3550;border-radius:10px;padding:10px;margin-bottom:10px}
+.docs{flex:1;overflow:auto;margin:0 -6px;padding:0 6px}
+.doc{display:flex;gap:9px;padding:8px 9px;border-radius:9px;cursor:pointer;border:1px solid transparent;margin-bottom:3px;align-items:center}
+.doc:hover{background:#1d2638}.doc.on{background:#1c2a4d;border-color:var(--acc)}
+.di{font-size:17px}.dn{font-size:12.5px;line-height:1.35;word-break:break-all}.dm{color:var(--mut);font-size:11px}
+.center{display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.viewpane{flex:0 0 42%;overflow:auto;display:flex;flex-direction:column}
+#viewer{flex:1;overflow:auto;font-size:13px;line-height:1.75;white-space:pre-wrap;background:#0b101c;border-radius:8px;padding:12px;margin-top:8px;font-family:Consolas,'Noto Sans CJK SC',monospace}
+#viewer img{max-width:100%;border-radius:8px}
+.card{background:var(--card);border:1px solid #232d45;border-radius:12px;padding:14px 16px;margin-bottom:0}
+.center .card:last-child{flex:1;overflow:auto;display:flex;flex-direction:column}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.rtab{position:relative;background:#0d1220;border:1px solid #2a3550;color:var(--mut);padding:5px 12px;border-radius:99px;font-size:12.5px;cursor:pointer}
+.rtab.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.rdot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:var(--ok);display:none}
+.rdot.has{display:block}
+.rpane{overflow:auto}
+.chatpane{background:var(--card);border:1px solid #232d45;border-radius:12px;display:flex;flex-direction:column;overflow:hidden}
+.ch{padding:12px 14px;border-bottom:1px solid #232d45;font-weight:bold}
+.cbody{flex:1;overflow:auto;padding:12px}
+.cfoot{border-top:1px solid #232d45;padding:10px}
+.msg{margin:0 0 10px;padding:9px 11px;border-radius:9px;background:#0d1220;font-size:13px;white-space:pre-wrap;word-break:break-word}
+.msg.user{background:#1c2a4d}
+.steps{font-size:11.5px;color:var(--mut);margin-top:6px;border-top:1px dashed #2a3550;padding-top:5px}
+.item{border:1px solid #232d45;border-radius:10px;padding:10px 12px;margin:8px 0;background:#131a29}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11.5px;background:#232d45;color:var(--mut)}
+.risk-高危{background:#3d1216;color:#ff8a8a}.risk-中风险{background:#3a2c10;color:#ffd08a}
+.cite{color:var(--acc);cursor:pointer;font-size:12px;border-bottom:1px dashed var(--acc)}
+table.rt{width:100%;border-collapse:collapse;font-size:12.5px}table.rt th,table.rt td{padding:6px;border-bottom:1px solid #232d45;text-align:left;vertical-align:top}
+@media(max-width:1100px){.layout{grid-template-columns:230px minmax(0,1fr);height:auto}.chatpane{grid-column:1/-1;height:380px}}
+</style><script>
 const CID="{{case.case_id}}";
 const KEYLABEL={focuses:'争议焦点',cross_exam:'质证要点',defense_lines:'辩护方向',risks:'风险提示'};
-function esc(s){return (s||'').replace(/</g,'&lt;')}
+let DOCS={}, curTab='evidence';
+function esc(s){return (s||'').toString().replace(/</g,'&lt;')}
 function cite(c){if(!c.chunk_id)return `<span class="cite">${esc(c.doc_name)}·P${c.page}</span>`;return `<span class="cite" onclick="showChunk(CID,'${c.chunk_id}')">${esc(c.doc_name)}·P${c.page} ↗</span>`}
 function render(key,a){if(!a)return '<em>无</em>';let h='';
- if(key==='evidence'){(a.items||[]).forEach(i=>{h+=`<div class="card"><span class="tag">${i.type}</span> <b>${esc(i.title)}</b><p>${esc(i.detail)}</p><p>${(i.citations||[]).map(cite).join(' ')}</p></div>`})}
- else if(key==='timeline'){h='<table><tr><th>时间</th><th>事件</th><th>意义</th><th>来源</th></tr>';(a.items||[]).forEach(i=>{h+=`<tr><td>${esc(i.date)}</td><td>${esc(i.event)}</td><td>${esc(i.significance)}</td><td>${(i.citations||[]).map(cite).join(' ')}</td></tr>`});h+='</table>'}
- else if(key==='contradictions'){(a.items||[]).forEach((i,n)=>{h+=`<div class="card"><span class="tag risk-${i.risk}">${i.risk}</span> <b>${esc(i.topic)}</b><p>A：<span class="cite" onclick="jumpDoc('${esc(i.claim_a.source_doc)}',${i.claim_a.page})">「${esc(i.claim_a.text)}」</span> — ${esc(i.claim_a.source_doc)}·P${i.claim_a.page}</p><p>B：<span class="cite" onclick="jumpDoc('${esc(i.claim_b.source_doc)}',${i.claim_b.page})">「${esc(i.claim_b.text)}」</span> — ${esc(i.claim_b.source_doc)}·P${i.claim_b.page}</p><p style="color:var(--mut)">${esc(i.analysis)}</p></div>`})}
- else if(key==='irrelevant'){h='<ul>'+(a.items||[]).map(i=>`<li><b>${esc(i.doc_name)}</b> — ${esc(i.reason)}</li>`).join('')+'</ul>'}
+ if(key==='evidence'){(a.items||[]).forEach(i=>{h+=`<div class="item"><span class="tag">${esc(i.type)}</span> <b>${esc(i.title)}</b><p style="margin:6px 0">${esc(i.detail)}</p><p>${(i.citations||[]).map(cite).join(' ')}</p></div>`})}
+ else if(key==='timeline'){h='<table class="rt"><tr><th>时间</th><th>事件</th><th>意义</th><th>来源</th></tr>';(a.items||[]).forEach(i=>{h+=`<tr><td>${esc(i.date)}</td><td>${esc(i.event)}</td><td>${esc(i.significance)}</td><td>${(i.citations||[]).map(cite).join(' ')}</td></tr>`});h+='</table>'}
+ else if(key==='contradictions'){(a.items||[]).forEach(i=>{h+=`<div class="item"><span class="tag risk-${esc(i.risk)}">${esc(i.risk)}</span> <b>${esc(i.topic)}</b><p style="margin:6px 0">A：<span class="cite" onclick="jumpDoc('${esc(i.claim_a.source_doc)}',${i.claim_a.page||1},'${esc((i.claim_a.text||'').slice(0,20))}')">「${esc(i.claim_a.text)}」</span> <span style="color:var(--mut);font-size:11px">${esc(i.claim_a.source_doc)}·P${i.claim_a.page||1}</span></p><p>B：<span class="cite" onclick="jumpDoc('${esc(i.claim_b.source_doc)}',${i.claim_b.page||1},'${esc((i.claim_b.text||'').slice(0,20))}')">「${esc(i.claim_b.text)}」</span> <span style="color:var(--mut);font-size:11px">${esc(i.claim_b.source_doc)}·P${i.claim_b.page||1}</span></p><p style="color:var(--mut);font-size:12.5px">${esc(i.analysis)}</p></div>`})}
+ else if(key==='irrelevant'){h='<ul style="margin:6px 0;padding-left:20px">'+(a.items||[]).map(i=>`<li style="margin:6px 0"><b>${esc(i.doc_name)}</b> — ${esc(i.reason)}</li>`).join('')+'</ul>'+(a.kept_docs&&a.kept_docs.length?`<p style="color:var(--mut);font-size:12px">保留：${a.kept_docs.map(esc).join('、')}</p>`:'')}
  else if(key==='summary'){h=`<p><b>当事人：</b>${esc(a.parties)}</p><p>${esc(a.overview)}</p><p><b>涉案金额：</b>${esc(a.amount)}</p><ul>${(a.key_points||[]).map(p=>'<li>'+esc(p)+'</li>').join('')}</ul><p>${(a.citations||[]).map(cite).join(' ')}</p>`}
- else if(key==='trial_strategy'){h=['focuses','cross_exam','defense_lines','risks'].map(k=>`<p><b>${KEYLABEL[k]}</b></p><ul>${(a[k]||[]).map(x=>'<li>'+esc(x)+'</li>').join('')}</ul>`).join('')}
+ else if(key==='trial_strategy'){h=['focuses','cross_exam','defense_lines','risks'].map(k=>`<p style="margin:8px 0 2px"><b>${KEYLABEL[k]}</b></p><ul style="margin:2px 0;padding-left:20px">${(a[k]||[]).map(x=>'<li>'+esc(x)+'</li>').join('')}</ul>`).join('')}
  else if(key==='bank_flow'){h=`<p>期间：${esc(a.period)}　流入:${esc(a.total_in)}　流出:${esc(a.total_out)}</p><ul>${(a.anomalies||[]).map(x=>'<li><b>'+esc(x.desc)+'</b> '+esc(x.evidence)+'</li>').join('')}</ul><p>${esc(a.conclusion)}</p>`}
  return h||'<em>空</em>'}
-function jumpDoc(name,page){drawer.open('<p>正在定位 '+name+' 第'+page+'页…</p>');fetch('/api/cases/'+CID+'/search?q='+encodeURIComponent(String(name).slice(0,8))+'&k=10').then(r=>r.json()).then(rs=>{const hit=rs.find(r=>r.doc_name===name&&r.page==page)||rs[0];if(hit)showChunk(CID,hit.chunk_id);else drawer.open('<p>未找到该页锚点</p>')})}
+/* ---------- doc viewer ---------- */
+async function loadDocs(){DOCS=JSON.parse(await (await fetch('/api/cases/'+CID)).text()).docs.reduce((m,d)=>(m[d.doc_id]=d,m),{})}
+async function selectDoc(id){document.querySelectorAll('.doc').forEach(e=>e.classList.toggle('on',e.dataset.doc===id));
+ const d=DOCS[id];vtitle.textContent=d.name;vmeta.textContent=`${d.kind} · ${d.pages}页 · sha256:${d.sha256.slice(0,10)}…`;
+ if(d.kind==='image'){viewer.innerHTML=`<img src="/files/${CID}/${id}?name=${encodeURIComponent(d.name)}">`;return}
+ const r=await fetch(`/api/cases/${CID}/doc/${id}`);if(!r.ok){viewer.textContent='（无解析文本）';return}
+ const j=await r.json();viewer.innerHTML=j.pages.map(p=>`<div style="color:var(--acc);font-size:11px;margin-top:8px">— 第${p.page}页 —</div>`+esc(p.text)).join('\n')}
+/* ---------- citation jump: scroll viewer to source ---------- */
+async function showChunk(cid,chunkId){const c=await (await fetch(`/api/cases/${cid}/chunk/${chunkId}`)).json();
+ // find its doc & open it
+ const dd=Object.values(DOCS).find(d=>d.name===c.doc_name)||Object.values(DOCS)[0];
+ if(dd){await selectDoc(dd.doc_id)}
+ drawer.open(`<h2>${esc(c.doc_name)} · 第${c.page}页 · 原文锚点</h2><pre style="white-space:pre-wrap;font-size:13px;line-height:1.8">${esc(c.text)}</pre>`);
+ setTimeout(()=>{const i=viewer.textContent.indexOf(String(c.text).slice(0,24));if(i>0){const el=viewer;const pos=(el.textContent.slice(0,i).length/el.textContent.length)*el.scrollHeight;el.scrollTop=pos-60}},150)}
+function jumpDoc(name,page,quote){fetch('/api/cases/'+CID+'/search?q='+encodeURIComponent((quote||name).slice(0,16))+'&k=8').then(r=>r.json()).then(rs=>{const hit=rs.find(r=>r.doc_name===name)||rs[0];if(hit)showChunk(CID,hit.chunk_id);else drawer.open('<p>未找到该页锚点</p>')})}
+/* ---------- upload / analyze ---------- */
 async function upload(){const fs=f.files;if(!fs.length)return;upmsg.textContent='上传解析中…';
  for(const file of fs){const fd=new FormData();fd.append('file',file);
  const r=await fetch('/api/cases/'+CID+'/documents',{method:'POST',body:fd});const j=await r.json();
- upmsg.textContent=file.name+' → '+(j.status||'失败')+' pages='+(j.pages||0)+' chunks='+(j.chunks||0)+(j.error?(' '+j.error):'');if(fs.length>1)await new Promise(s=>setTimeout(s,400))}
- setTimeout(()=>location.reload(),900)}
+ upmsg.textContent=file.name+' → '+(j.status||'失败')+' pages='+(j.pages||0)+' chunks='+(j.chunks||0)+(j.error?(' '+j.error):'')}
+ location.reload()}
 async function analyzeAll(){anaBtn.disabled=true;const keys=['evidence','timeline','contradictions','irrelevant','summary','trial_strategy','bank_flow'];
- for(const k of keys){anaprogress.textContent='正在生成：'+k+' …（深度模型，请稍候）';try{const r=await fetch('/api/cases/'+CID+'/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:k})});const a=await r.json();document.getElementById('r-'+k).innerHTML=render(k,a);}catch(e){anaprogress.textContent=k+' 失败:'+e}}}
- anaBtn.disabled=false;anaprogress.textContent='✅ 全部分析完成'}
+ for(const k of keys){anaprogress.textContent='⏳ 正在生成：'+k+' …';try{const r=await fetch('/api/cases/'+CID+'/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:k})});const a=await r.json();paint(k,a);}catch(e){anaprogress.textContent=k+' 失败:'+e}}
+ anaBtn.disabled=false;anaprogress.textContent='✅ 七类报告全部完成'}
+function paint(k,a){const el=document.getElementById('r-'+k);el.innerHTML=render(k,a);const dot=document.getElementById('dot-'+k);if(dot)(Array.isArray(a.items)?a.items.length:Object.keys(a||{}).length)>0&&dot.classList.add('has')}
+function showTab(k){curTab=k;document.querySelectorAll('.rtab').forEach(b=>b.classList.toggle('on',b.dataset.k===k));document.querySelectorAll('.rpane').forEach(p=>p.style.display=p.dataset.key===k?'block':'none')}
+/* ---------- chat ---------- */
 async function ask(){if(!q.value.trim())return;const t=q.value;q.value='';
- chatlog.insertAdjacentHTML('beforeend','<div class="msg"><b>我：</b>'+esc(t)+'</div>');
- chatlog.insertAdjacentHTML('beforeend','<div class="msg" id="typing">🤖 思考中（ReAct循环+工具调用）…</div>');
- const openEl=document.querySelector('#reports details[open] > div[id]');const pageCtx=openEl?openEl.innerText.slice(0,2500):'';
+ chatlog.insertAdjacentHTML('beforeend',`<div class="msg user"><b>我：</b>${esc(t)}</div>`);
+ const ph=document.createElement('div');ph.className='msg';ph.id='typing';ph.textContent='🤖 思考中（ReAct+工具调用）…';chatlog.appendChild(ph);
+ const openEl=document.getElementById('r-'+curTab);const pageCtx=openEl?openEl.innerText.slice(0,2500):'';
  const r=await fetch('/api/cases/'+CID+'/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:t,page_context:pageCtx,heavy:heavy.checked})});
- const j=await r.json();document.getElementById('typing')?.remove();
- const steps=j.steps.map(s=>s.type=='tool'?('🔧 '+s.action+' '+JSON.stringify(s.input)):('✅ 得出结论')).join('<br>');
- chatlog.insertAdjacentHTML('beforeend','<div class="msg"><b>AI：</b>'+esc(j.answer).replace(/\n/g,'<br>')+'<div class="steps">执行轨迹:<br>'+steps+'</div></div>')}
-window.addEventListener('load',()=>{fetch('/api/cases/'+CID+'/analyses').then(r=>r.json()).then(all=>{document.querySelectorAll('#reports div[data-key]').forEach(el=>{const k=el.dataset.key;if(all[k])el.innerHTML=render(k,all[k])})})});
+ const j=await r.json();ph.remove();
+ const steps=(j.steps||[]).map(s=>s.type=='tool'?('🔧 '+s.action+' '+JSON.stringify(s.input)):('✅ 得出结论')).join('\n');
+ chatlog.insertAdjacentHTML('beforeend',`<div class="msg"><b>AI：</b>${esc(j.answer)}<div class="steps">执行轨迹：\n${esc(steps)}</div></div>`);chatlog.scrollTop=chatlog.scrollHeight}
+q.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask()}});
+/* ---------- boot ---------- */
+window.addEventListener('load',async()=>{await loadDocs();
+ fetch('/api/cases/'+CID+'/analyses').then(r=>r.json()).then(all=>{let n=0;for(const k in all){paint(k,all[k]);n++}rmeta.textContent=n?`${n}/7 已生成`:'';showTab(curTab)});
+ document.querySelectorAll('.rpane').forEach(el=>{if(el.dataset.key!=='evidence')el.style.display='none'});
+ if(Object.keys(DOCS).length)selectDoc(Object.keys(DOCS)[0])});
 </script>{% endblock %}

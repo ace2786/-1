@@ -4,7 +4,7 @@
   "charge": "非法吸收公众存款罪",
   "suspect": "张某某",
   "created_at": "2026-09-24T05:57:00.159975+00:00",
-  "updated_at": "2026-09-24T06:01:54.681367+00:00",
+  "updated_at": "2026-09-24T08:55:20.244882+00:00",
   "docs": [
     {
       "doc_id": "207ec7f6a473",
@@ -57,6 +57,17 @@
       "size": 202,
       "sha256": "2a11e42bcdd649a2c6ed65eae424922708f8dffc621d243d57183adff867e2c8",
       "uploaded_at": "2026-09-24T06:01:54.680969+00:00",
+      "pages": 1,
+      "status": "parsed",
+      "error": null
+    },
+    {
+      "doc_id": "2f438e5e7e3e",
+      "name": "mock_scan.png",
+      "kind": "image",
+      "size": 29708,
+      "sha256": "c31e7e84a81085c4e5e6a42d2a27d68550acb5180df543ad47250cfbfae67436",
+      "uploaded_at": "2026-09-24T08:55:19.992870+00:00",
       "pages": 1,
       "status": "parsed",
       "error": null

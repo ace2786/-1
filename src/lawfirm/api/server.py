@@ -128,6 +128,34 @@ async def upload(case_id: str, file: UploadFile = File(...)):
             "chunks": n_chunks, "error": dm.error}
 
 
+@app.get("/api/cases/{case_id}/doc/{doc_id}")
+async def doc_text(case_id: str, doc_id: str):
+    """Parsed page-anchored text of one document (for the in-page viewer)."""
+    from ..rag.store import _case_dir as cd
+    tj = cd(case_id) / "documents" / f"{doc_id}.text.json"
+    if not tj.exists():
+        raise HTTPException(404, "parsed text not found")
+    return json.loads(tj.read_text(encoding="utf-8"))
+
+
+@app.get("/files/{case_id}/{doc_id}")
+async def raw_file(case_id: str, doc_id: str, name: str = ""):
+    """Serve original uploaded file (images preview inline). Local-only binding keeps this safe."""
+    from pathlib import Path as _P
+    from fastapi.responses import FileResponse
+    base = (_case_dir(case_id) / "documents").resolve()
+    cands = [f for f in base.glob(doc_id + "*") if f.suffix.lower() != ".json"]
+    if not cands:
+        raise HTTPException(404, "file not found")
+    target = cands[0].resolve()
+    if base not in target.parents:  # path traversal guard
+        raise HTTPException(400, "bad path")
+    media = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+             ".pdf": "application/pdf", ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}
+    return FileResponse(str(target), media_type=media.get(target.suffix.lower(), "application/octet-stream"),
+                        filename=name or target.name)
+
+
 @app.post("/api/cases/{case_id}/analyze", dependencies=[Depends(check_token)])
 async def analyze(case_id: str, body: AnalyzeBody):
     load_case(case_id)

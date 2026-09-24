@@ -137,3 +137,9 @@
 {"ts": "2026-09-24T07:11:21.999962+00:00", "event": "agent_final", "case_id": "b5e67f66ac70", "actor": "user", "question": "本案一共有多少处事实矛盾？", "steps": 2}
 {"ts": "2026-09-24T07:12:29.264021+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
 {"ts": "2026-09-24T07:12:29.265825+00:00", "event": "analysis_run", "case_id": "b5e67f66ac70", "actor": "user", "status": "ok", "duration_s": 7.814, "error": null}
+{"ts": "2026-09-24T08:55:20.244571+00:00", "event": "doc_parsed", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 0.252, "error": null}
+{"ts": "2026-09-24T08:55:23.351759+00:00", "event": "doc_uploaded", "case_id": "248e7c69217f", "actor": "user", "doc": "mock_scan.png", "sha256": "c31e7e84a810", "chunks": 6}
+{"ts": "2026-09-24T08:57:24.341015+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T08:57:24.342599+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 13.604, "error": null}
+{"ts": "2026-09-24T08:57:41.758055+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T08:57:41.758234+00:00", "event": "analysis_run", "case_id": "248e7c69217f", "actor": "user", "status": "ok", "duration_s": 17.18, "error": null}
