@@ -58,12 +58,14 @@ RULES = {
     },
     "故意伤害罪": {
         "article": "刑法第234条",
+        # amount_yuan here means injury level: 1=轻伤 2=重伤(默认) 10=致死/特别残忍致残
+        "injury_mode": True,
         "tiers": [
-            {"name": "轻伤", "cond": lambda m, s: True, "range": (0, 3), "note": "三年以下"},
-            {"name": "重伤", "cond": lambda m, s: m >= 1, "range": (3, 10), "note": "三至十年（m参数此处传伤害等级系数）"},
-            {"name": "致死/特别残忍致残", "cond": lambda m, s: m >= 10, "range": (10, 15), "note": "十年以上、无期或死刑"},
+            {"name": "轻伤", "cond": lambda m, s: m <= 1, "range": (0, 3), "note": "三年以下有期徒刑、拘役或管制"},
+            {"name": "重伤", "cond": lambda m, s: 1 < m <= 9 or m == 0, "range": (3, 10), "note": "三年以上十年以下有期徒刑"},
+            {"name": "致死/特别残忍致严重残疾", "cond": lambda m, s: m >= 10, "range": (10, 15), "note": "十年以上有期徒刑、无期徒刑或死刑"},
         ],
-        "entry": {"amount": None, "victims": None, "note": "轻伤鉴定即入罪"},
+        "entry": {"amount": None, "victims": None, "note": "轻伤二级以上鉴定即入罪"},
     },
 }
 
@@ -130,8 +132,11 @@ def advise(charge: str, amount_yuan: float = 0, victims: int = 0,
     adj_lo, adj_hi = round(lo_m * mult, 1), round(hi_m * mult, 1)
 
     entry = rule["entry"]
-    meets = (entry["amount"] is None or amount_yuan >= entry["amount"]) and \
-            (entry["victims"] is None or victims >= entry["victims"])
+    if rule.get("injury_mode"):
+        meets = True  # 伤情鉴定已构成即入罪，金额字段此处为伤害等级
+    else:
+        meets = (entry["amount"] is None or amount_yuan >= entry["amount"]) and \
+                (entry["victims"] is None or victims >= entry["victims"])
     caveats = [
         "本结果为法条区间的确定性推算，仅供辩护研究参考，不构成法律意见",
         "具体量刑须结合当地实施细则与法官自由裁量",

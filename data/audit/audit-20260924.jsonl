@@ -185,3 +185,54 @@
 {"ts": "2026-09-24T09:35:01.411156+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "非法吸收公众存款罪", "amount_yuan": 42000000.0, "victims": 62, "factors": ["guilty_plea"]}
 {"ts": "2026-09-24T09:35:01.449812+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "非法吸收公众存款罪", "amount_yuan": 60000000.0, "victims": 62, "factors": []}
 {"ts": "2026-09-24T09:35:01.487563+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "盗窃罪", "amount_yuan": 5000.0, "victims": 0, "factors": ["surrender", "restitution"]}
+{"ts": "2026-09-24T09:44:53.947693+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T09:44:53.949389+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T09:45:14.246446+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "__list__", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T09:45:14.248413+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "?", "amount_yuan": 0, "victims": 0, "factors": []}
+{"ts": "2026-09-24T09:53:52.386566+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:53:52.388780+00:00", "event": "analysis_run", "case_id": "db6556e8d754", "actor": "user", "status": "ok", "duration_s": 33.05, "error": null}
+{"ts": "2026-09-24T09:54:14.538223+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:54:14.538491+00:00", "event": "analysis_run", "case_id": "db6556e8d754", "actor": "user", "status": "ok", "duration_s": 22.147, "error": null}
+{"ts": "2026-09-24T09:54:20.361073+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:54:20.361298+00:00", "event": "analysis_run", "case_id": "db6556e8d754", "actor": "user", "status": "ok", "duration_s": 5.822, "error": null}
+{"ts": "2026-09-24T09:54:23.736813+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:54:23.737024+00:00", "event": "analysis_run", "case_id": "db6556e8d754", "actor": "user", "status": "ok", "duration_s": 3.371, "error": null}
+{"ts": "2026-09-24T09:54:36.722610+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:54:36.722782+00:00", "event": "analysis_run", "case_id": "db6556e8d754", "actor": "user", "status": "ok", "duration_s": 12.985, "error": null}
+{"ts": "2026-09-24T09:54:45.362903+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:54:45.363090+00:00", "event": "analysis_run", "case_id": "db6556e8d754", "actor": "user", "status": "ok", "duration_s": 8.64, "error": null}
+{"ts": "2026-09-24T09:54:50.725698+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:54:50.725919+00:00", "event": "analysis_run", "case_id": "db6556e8d754", "actor": "user", "status": "ok", "duration_s": 5.362, "error": null}
+{"ts": "2026-09-24T09:55:00.071822+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:55:00.072058+00:00", "event": "analysis_run", "case_id": "32db993ed208", "actor": "user", "status": "ok", "duration_s": 9.249, "error": null}
+{"ts": "2026-09-24T09:55:09.684372+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:55:09.684584+00:00", "event": "analysis_run", "case_id": "32db993ed208", "actor": "user", "status": "ok", "duration_s": 9.612, "error": null}
+{"ts": "2026-09-24T09:55:19.009677+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:55:19.009978+00:00", "event": "analysis_run", "case_id": "32db993ed208", "actor": "user", "status": "ok", "duration_s": 9.325, "error": null}
+{"ts": "2026-09-24T09:55:22.403808+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:55:22.403968+00:00", "event": "analysis_run", "case_id": "32db993ed208", "actor": "user", "status": "ok", "duration_s": 3.393, "error": null}
+{"ts": "2026-09-24T09:55:35.675135+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:55:35.675349+00:00", "event": "analysis_run", "case_id": "32db993ed208", "actor": "user", "status": "ok", "duration_s": 13.271, "error": null}
+{"ts": "2026-09-24T09:55:41.140489+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:55:41.140700+00:00", "event": "analysis_run", "case_id": "32db993ed208", "actor": "user", "status": "ok", "duration_s": 5.465, "error": null}
+{"ts": "2026-09-24T09:55:46.889588+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:55:46.889765+00:00", "event": "analysis_run", "case_id": "32db993ed208", "actor": "user", "status": "ok", "duration_s": 5.749, "error": null}
+{"ts": "2026-09-24T09:56:00.667673+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:56:00.667914+00:00", "event": "analysis_run", "case_id": "952c5a2c1357", "actor": "user", "status": "ok", "duration_s": 13.667, "error": null}
+{"ts": "2026-09-24T09:56:35.929978+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:56:35.930185+00:00", "event": "analysis_run", "case_id": "952c5a2c1357", "actor": "user", "status": "ok", "duration_s": 35.261, "error": null}
+{"ts": "2026-09-24T09:56:53.630765+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:56:53.630971+00:00", "event": "analysis_run", "case_id": "952c5a2c1357", "actor": "user", "status": "ok", "duration_s": 17.7, "error": null}
+{"ts": "2026-09-24T09:56:57.128932+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:56:57.129151+00:00", "event": "analysis_run", "case_id": "952c5a2c1357", "actor": "user", "status": "ok", "duration_s": 3.497, "error": null}
+{"ts": "2026-09-24T09:57:13.485069+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:57:13.485248+00:00", "event": "analysis_run", "case_id": "952c5a2c1357", "actor": "user", "status": "ok", "duration_s": 16.356, "error": null}
+{"ts": "2026-09-24T09:57:26.194354+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:57:26.194510+00:00", "event": "analysis_run", "case_id": "952c5a2c1357", "actor": "user", "status": "ok", "duration_s": 12.709, "error": null}
+{"ts": "2026-09-24T09:57:35.756892+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:8b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T09:57:35.757834+00:00", "event": "analysis_run", "case_id": "952c5a2c1357", "actor": "user", "status": "ok", "duration_s": 9.563, "error": null}
+{"ts": "2026-09-24T09:58:34.420505+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "故意伤害罪", "amount_yuan": 1.0, "victims": 0, "factors": ["guilty_plea", "restitution"]}
+{"ts": "2026-09-24T09:58:34.456627+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "诈骗罪", "amount_yuan": 850000.0, "victims": 1, "factors": ["confession"]}
+{"ts": "2026-09-24T09:59:13.184243+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "敏害伤害氏", "amount_yuan": 1.0, "victims": 0, "factors": ["guilty_plea", "restitution"]}
+{"ts": "2026-09-24T09:59:35.197187+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "故意伤害罪", "amount_yuan": 1.0, "victims": 0, "factors": ["guilty_plea", "restitution"]}
+{"ts": "2026-09-24T09:59:35.215746+00:00", "event": "sentencing_query", "case_id": null, "actor": "user", "charge": "故意伤害罪", "amount_yuan": 2.0, "victims": 0, "factors": []}
