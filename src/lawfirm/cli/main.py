@@ -98,7 +98,7 @@ def serve(host: str = "127.0.0.1", port: int = 8000):
     '''启动 Web GUI/API 服务。'''
     import uvicorn
     from ..api.server import app as fastapi_app
-    uvicorn.run(fastapi_app, host=host, port=port)
+    uvicorn.run(fastapi_app, host=host, port=port)  # server module already mounts GUI at import
 
 
 @app.command("mcp")

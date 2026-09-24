@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="560" font-family="'Noto Sans CJK SC',sans-serif">
+<defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#4f7cff"/></marker></defs>
+<style>.b{fill:#171e2e;stroke:#2a3550;rx:10}.t{fill:#e8ecf5;font-size:15px}.s{fill:#8b96ad;font-size:11.5px}.h{fill:#4f7cff;font-size:13px;font-weight:bold}line{stroke:#4f7cff;stroke-width:1.6;marker-end:url(#ar)}</style>
+<rect width="980" height="560" fill="#0f1420"/>
+<text x="490" y="34" text-anchor="middle" fill="#e8ecf5" font-size="20" font-weight="bold">律所办案辅助系统 · 架构（全离线）</text>
+<!-- clients -->
+<rect class="b" x="40" y="70" width="200" height="70" rx="10"/><text class="t" x="140" y="98" text-anchor="middle">Web GUI</text><text class="s" x="140" y="118" text-anchor="middle">FastAPI+Jinja2 工作台</text>
+<rect class="b" x="40" y="160" width="200" height="70" rx="10"/><text class="t" x="140" y="188" text-anchor="middle">CLI</text><text class="s" x="140" y="208" text-anchor="middle">lawfirm ask / analyze</text>
+<rect class="b" x="40" y="250" width="200" height="70" rx="10"/><text class="t" x="140" y="278" text-anchor="middle">MCP Server</text><text class="s" x="140" y="298" text-anchor="middle">stdio · 6 tools for agents</text>
+<!-- core -->
+<rect class="b" x="330" y="70" width="290" height="250" rx="12"/>
+<text class="h" x="475" y="95" text-anchor="middle">lawfirm-core（同一内核）</text>
+<text class="t" x="350" y="125">ReAct 智能体循环</text><text class="s" x="350" y="143">工具先行·防幻觉纪律·执行轨迹</text>
+<text class="t" x="350" y="170">七类结构化分析</text><text class="s" x="350" y="188">证据/时间线/矛盾/摘要/策略…</text>
+<text class="t" x="350" y="215">RAG 检索 + chunk锚点</text><text class="s" x="350" y="233">numpy向量库·维度自愈·哈希降级</text>
+<text class="t" x="350" y="260">解析层</text><text class="s" x="350" y="278">pypdf / openpyxl / tesseract OCR</text>
+<!-- models -->
+<rect class="b" x="710" y="70" width="230" height="110" rx="10"/>
+<text class="h" x="825" y="95" text-anchor="middle">Ollama 本地推理</text>
+<text class="t" x="730" y="122">qwen3:8b 深度分析</text>
+<text class="t" x="730" y="145">qwen3:1.7b 快速对话</text>
+<text class="t" x="730" y="168">nomic-embed 向量</text>
+<!-- storage & obs -->
+<rect class="b" x="710" y="210" width="230" height="110" rx="10"/>
+<text class="h" x="825" y="235" text-anchor="middle">存储与观测</text>
+<text class="s" x="730" y="258">data/cases JSONL+npz</text>
+<text class="s" x="730" y="278">audit/*.jsonl 审计链</text>
+<text class="s" x="730" y="298">/metrics /health structlog</text>
+<!-- bottom notes -->
+<rect class="b" x="40" y="360" width="900" height="150" rx="12"/>
+<text class="h" x="60" y="388">六性设计</text>
+<text class="s" x="60" y="412">有效性：结论强制附引用并回填chunk_id｜高效性：批量embedding并发限流、增量分析、按key运行</text>
+<text class="s" x="60" y="432">稳定性：LLM重试、模型缺失自动降级、embedding维度自愈｜安全性：默认绑定127.0.0.1、可选Token、SHA-256存证、全程无外发</text>
+<text class="s" x="60" y="452">可观测性：每步审计JSONL、进程内指标快照、structlog结构化日志｜数据飞轮：feedback接口沉淀修正样本供后续few-shot</text>
+<text class="s" x="60" y="482" fill="#31c48d">断网可用 ✓ 卷宗不出本机 ✓ 三种形态共享同一测试过的核心 ✓</text>
+<!-- arrows -->
+<line x1="240" y1="105" x2="328" y2="130"/><line x1="240" y1="195" x2="328" y2="195"/><line x1="240" y1="285" x2="328" y2="255"/>
+<line x1="620" y1="130" x2="708" y2="120"/><line x1="620" y1="230" x2="708" y2="255"/>
+</svg>

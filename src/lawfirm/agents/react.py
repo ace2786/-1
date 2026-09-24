@@ -41,7 +41,8 @@ async def ask(question: str, case_id: str, page_context: str | None = None,
               max_steps: int = 6, heavy: bool = False) -> dict:
     specs = "\n".join(f'- {t['name']}: {t['desc']} 参数:{json.dumps(t['params'], ensure_ascii=False)}'
                       for t in T.TOOL_SPECS)
-    convo = [f'问题：{question}']
+    convo = [f'问题：{question}',
+             '（系统提示：必须先至少调用一次工具获取事实，禁止跳过工具直接给 Final Answer）']
     if page_context:
         convo.insert(0, f'当前页面上下文摘要：\n{page_context[:3000]}')
     steps: list[Step] = []

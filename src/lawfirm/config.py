@@ -29,9 +29,16 @@ class Settings(BaseSettings):
     # observability
     log_level: str = "INFO"
 
-    class Config:
-        env_prefix = "LAWFIRM_"
+    model_config = {
+        "env_prefix": "LAWFIRM_",
+        "extra": "ignore",
+    }
 
+
+_settings_file = Path(__file__).resolve().parents[2] / "lawfirm.local.env"
+if _settings_file.exists():
+    from dotenv import load_dotenv  # optional; provided by pydantic-settings deps
+    load_dotenv(_settings_file)
 
 settings = Settings()
 settings.cases_dir.mkdir(parents=True, exist_ok=True)

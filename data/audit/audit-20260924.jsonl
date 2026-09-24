@@ -115,3 +115,7 @@
 {"ts": "2026-09-24T06:49:42.917060+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
 {"ts": "2026-09-24T06:49:42.917547+00:00", "event": "agent_final", "case_id": "248e7c69217f", "actor": "user", "question": "本案一共有多少处事实矛盾？", "steps": 1}
 {"ts": "2026-09-24T06:49:43.825567+00:00", "event": "feedback_recorded", "case_id": "248e7c69217f", "actor": "user", "rating": 1}
+{"ts": "2026-09-24T06:50:46.417296+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T06:50:46.418175+00:00", "event": "agent_tool_call", "case_id": "248e7c69217f", "actor": "user", "action": "get_analysis", "input": {"key": "contradictions"}, "observation_len": 385}
+{"ts": "2026-09-24T06:50:47.459234+00:00", "event": "llm_generate", "case_id": null, "actor": "system", "model": "qwen3:1.7b", "attempt": 0, "ok": true}
+{"ts": "2026-09-24T06:50:47.459404+00:00", "event": "agent_final", "case_id": "248e7c69217f", "actor": "user", "question": "本案一共有多少处事实矛盾？", "steps": 2}
