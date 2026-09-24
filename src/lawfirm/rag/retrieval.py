@@ -44,9 +44,13 @@ async def build_index(case_id: str):
     if not all_chunks:
         return 0
     vecs = await embed([c["text"] for c in all_chunks])
-    np.savez_compressed(_emb_cache(case_id),
+    arr = np.asarray(vecs, dtype=np.float32)
+    import os as _os
+    tmp = str(_emb_cache(case_id)) + ".tmp.npz"
+    np.savez_compressed(tmp,
                         ids=np.array([c["chunk_id"] for c in all_chunks]),
-                        vecs=np.asarray(vecs, dtype=np.float32))
+                        vecs=arr, dim=np.int32(arr.shape[1]))
+    _os.replace(tmp, _emb_cache(case_id))
     Metrics.inc("index_builds"); log.info("index_built", case_id=case_id, chunks=len(all_chunks))
     return len(all_chunks)
 
@@ -78,6 +82,8 @@ def _load(case_id: str):
     if not chunks or not cache.exists():
         return None
     z = np.load(cache, allow_pickle=False)
+    qdim_probe = z["vecs"].shape[1] if "vecs" in z else -1
+    # dim mismatch (e.g. rebuilt with fallback hashing after real model) -> force rebuild signal
     id2vec = {str(i): v for i, v in zip(z["ids"], z["vecs"])}
     _state[case_id] = (chunks, id2vec)
     return _state[case_id]
@@ -90,10 +96,20 @@ async def search(case_id: str, query: str, k: int = 6) -> list[dict]:
         return []
     chunks, id2vec = st
     qv = np.asarray((await embed([query]))[0], dtype=np.float32)
+    any_v = next(iter(id2vec.values()), None)
+    if any_v is not None and qv.shape[0] != any_v.shape[0]:
+        # index built with a different embedding backend than current -> rebuild once
+        log.warning("embed_dim_mismatch_rebuild", case_id=case_id)
+        await build_index(case_id)
+        st = _load(case_id)
+        if not st:
+            return []
+        chunks, id2vec = st
+        qv = np.asarray((await embed([query]))[0], dtype=np.float32)
     scored = []
     for c in chunks:
         v = id2vec.get(c["chunk_id"])
-        if v is None:
+        if v is None or v.shape[0] != qv.shape[0]:
             continue
         s = float(np.dot(qv, v) / (np.linalg.norm(qv) * np.linalg.norm(v) + 1e-9))
         scored.append((s, c))

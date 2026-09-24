@@ -4,9 +4,10 @@ Every item carries citations [{doc_name, page, chunk_id}] so the GUI can render
 clickable source jumps (溯源跳转).
 """
 import json
-from ..llm import generate_json
+from ..llm import generate_json, ensure_models
 from ..observe import traced, audit
 from ..rag.store import load_chunks, save_analysis, load_case
+from ..config import settings
 
 ANALYSIS_KEYS = ["evidence", "timeline", "contradictions", "irrelevant",
                  "summary", "trial_strategy", "bank_flow"]
@@ -32,17 +33,57 @@ _SCHEMA = {
 }
 
 
+
+async def _pick_model(heavy: bool) -> str | None:
+    """Route to heavy model; fall back to light automatically if not pulled yet."""
+    from ..llm import ensure_models
+    st = await ensure_models()
+    want = [key for key in ("heavy_model", "light_model")]
+    if heavy and not any(m == __import__("lawfirm.config", fromlist=["settings"]).settings.heavy_model or
+                         m.split(":")[0] == __import__("lawfirm.config", fromlist=["settings"]).settings.heavy_model.split(":")[0]
+                         for m in st["have"]):
+        return None  # light via generate default
+    return None
+
+
 def _material(case_id: str, max_chars: int = 12000) -> tuple[str, list[dict]]:
-    """Concatenate chunks up to budget; return text + chunk index for citation fixing."""
+    """Concatenate deduped chunks (by doc_id+page) up to char budget."""
     chunks = load_chunks(case_id)
-    buf, used = [], []
+    buf, used, seen = [], [], set()
     total = 0
     for c in chunks:
-        seg = f'【{c['doc_name']}·第{c['page']}页】{c['text']}'
+        key = (c["doc_id"], c["page"])
+        if key in seen:
+            continue
+        seen.add(key)
+        seg = "【" + str(c["doc_name"]) + "·第" + str(c["page"]) + "页】" + str(c["text"])
         if total + len(seg) > max_chars and used:
             break
         buf.append(seg); used.append(c); total += len(seg)
     return "\n\n".join(buf), used
+
+
+def _fix_claims(payload, used_chunks):
+    """Attach chunk anchors to contradictions' claim_a/claim_b too."""
+    def find_chunk(doc_hint, text):
+        t = (text or "").strip()[:24]
+        for c in used_chunks:
+            if t and t in c["text"] and (not doc_hint or doc_hint in c["doc_name"]):
+                return c
+        for c in used_chunks:
+            if doc_hint and doc_hint in c["doc_name"]:
+                return c
+        return None
+    if isinstance(payload, dict):
+        for it in payload.get("items", []) if isinstance(payload.get("items"), list) else []:
+            for side in ("claim_a", "claim_b"):
+                cl = it.get(side)
+                if isinstance(cl, dict):
+                    c = find_chunk(cl.get("source_doc", ""), cl.get("text", ""))
+                    if c:
+                        cl["chunk_id"] = c["chunk_id"]
+                        cl["page"] = c["page"]
+                        cl["source_doc"] = c["doc_name"]
 
 
 def _fix_citations(payload, used_chunks):
@@ -70,12 +111,20 @@ async def run_analysis(case_id: str, key: str, *, heavy: bool = True) -> dict:
     material, used = _material(case_id)
     if not material.strip():
         return {"items": [], "error": "该案卷尚无已解析文本，请先上传并解析材料"}
+    hint = ""
+    if key in ("summary", "trial_strategy", "bank_flow"):
+        hint = "\n注意：顶层JSON对象的每个字段都必须填写（没有信息就填空字符串或空数组），items不是这些键的返回结构。"
     prompt = (f"{_PROMPTS[key]}\n罪名参考：{case.charge or '未知'}\n\n"
               f"严格输出JSON，形如 {_SCHEMA[key]} 。只依据给定卷宗内容，禁止编造；"
-              f"每条结论必须附citations，quote字段填卷宗原文片段。\n\n===卷宗材料===\n{material}")
+              f"每条结论必须附citations，quote字段填卷宗原文片段。{hint}\n\n===卷宗材料===\n{material}")
     with traced(f"analysis.{key}", event="analysis_run", case_id=case_id):
-        data = await generate_json(prompt, heavy=heavy, temperature=0.1)
+        from ..llm import ensure_models
+        st = await ensure_models()
+        _hb = settings.heavy_model.split(":")[0]
+        have_heavy = any(x.split(":")[0] == _hb and x != settings.light_model for x in st["have"])
+        data = await generate_json(prompt, heavy=(heavy and have_heavy), temperature=0.1)
     _fix_citations(data, used)
+    _fix_claims(data, used)
     save_analysis(case_id, key, data)
     return data
 

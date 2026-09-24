@@ -1,0 +1,22 @@
+{
+  "case_id": "22b74c65259e",
+  "title": "嵌入验证案",
+  "charge": "测试",
+  "suspect": "",
+  "created_at": "2026-09-24T06:21:24.263681+00:00",
+  "updated_at": "2026-09-24T06:21:24.281754+00:00",
+  "docs": [
+    {
+      "doc_id": "3dc12671b6b5",
+      "name": "doc1.txt",
+      "kind": "text",
+      "size": 267,
+      "sha256": "8ac97e700ca44707bf5301b7ba0a73f07bb1d28a0218e22a39ed134e6ef53377",
+      "uploaded_at": "2026-09-24T06:21:24.281317+00:00",
+      "pages": 1,
+      "status": "parsed",
+      "error": null
+    }
+  ],
+  "notes": ""
+}

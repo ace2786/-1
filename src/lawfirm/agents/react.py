@@ -30,6 +30,8 @@ Thought: <一句话推理>
 Action: <工具名>
 Action Input: <{{...}}JSON参数>
 
+重要纪律：Final Answer 只能基于上面出现过的 Observation 内容，禁止编造未在观察中出现的事实、页码或数量；若观察信息不足，如实说明缺口。
+
 或最终回答时：
 Thought: <总结>
 Final Answer: <给用户的完整中文回答，引用来源文档与页码>'''
@@ -73,7 +75,7 @@ async def ask(question: str, case_id: str, page_context: str | None = None,
                       "action": action, "input": args, "observation": obs[:1200]})
         audit("agent_tool_call", case_id=case_id, action=action, input=args,
               observation_len=len(obs))
-        convo.append(f'Thought: {thought}\nAction: {action}\nAction Input: {raw_in}\nObservation: {obs[:4000]}')
+        convo.append(f'Thought: {thought}\nAction: {action}\nAction Input: {raw_in}\nObservation: {obs}')
 
     # step budget exhausted -> force summarize
     out = await generate("\n\n".join(convo) + "\n\n已达最大步骤数，请基于以上观察直接给出 Final Answer。",
