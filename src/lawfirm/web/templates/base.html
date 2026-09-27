@@ -22,25 +22,20 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px;borde
 h1{font-size:20px}h2{font-size:16px;color:var(--mut)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
 
-/* ===== enterprise console scale (v3) ===== */
-body{font-size:16px}
-main{zoom:1.18}
-button,.btn{padding:11px 22px;font-size:15.5px;border-radius:9px;min-height:44px}
-input:not([type=checkbox]):not([type=file]),select,textarea{padding:11px 14px;font-size:15px;border-radius:9px;min-height:44px}
-input[type=file]{padding:8px;font-size:14px}
-.vbtn{padding:11px 26px!important;font-size:16px!important;border-radius:12px!important;min-height:48px}
-.rtab{padding:9px 18px!important;font-size:14px!important;min-height:40px}
-.tag{font-size:13px!important;padding:3px 11px!important}
-.cite{font-size:13.5px!important}
-h1{font-size:24px}h2{font-size:17px}
-header a{font-size:15.5px}
-table{font-size:14px}th,td{padding:9px 10px}
-.doc{padding:11px 12px!important}
-.dn{font-size:14px!important}
-.msg{font-size:14.5px!important}
-details summary{font-size:14px!important;padding:4px 0}
-label{font-size:14px}
-input[type=checkbox]{width:18px;height:18px;accent-color:var(--acc)}
+/* ===== comfortable scale v5 (reverted from 1.18 zoom) ===== */
+body{font-size:15px}
+button,.btn{padding:8px 16px;font-size:14px;border-radius:8px;min-height:36px}
+input:not([type=checkbox]):not([type=file]),select,textarea{padding:8px 12px;font-size:14px;border-radius:8px;min-height:36px}
+.vbtn{padding:8px 18px!important;font-size:14.5px!important}
+.rtab{padding:6px 14px!important;font-size:13px!important}
+h1{font-size:20px}h2{font-size:16px}
+
+/* ===== form controls dark fix (v4) ===== */
+select,input[type=text],input[type=number],input:not([type]),textarea{
+  background:#0d1220!important;color:#e8ecf5!important;border:1px solid #2a3550!important;
+  color-scheme:dark}
+select option{background:#0d1220;color:#e8ecf5}
+select:focus,input:focus,textarea:focus{border-color:var(--acc)!important;outline:none;box-shadow:0 0 0 3px rgba(79,124,255,.18)}
 </style></head><body>
 <header><a href="/" class="{% block nav_home %}{% endblock %}">案件工作台</a>
 <a href="/settings" class="{% block nav_set %}{% endblock %}">系统设置</a>
