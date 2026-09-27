@@ -87,7 +87,7 @@
  </div></div>
 {% endblock %}
 {% block scripts %}<style>
-.layout{display:grid;grid-template-columns:270px minmax(0,1fr) 340px;gap:14px;height:calc(100vh - 90px)}
+.layout{display:grid;grid-template-columns:clamp(280px,18vw,360px) minmax(0,1fr) clamp(360px,26vw,520px);gap:16px;height:calc(100vh - 90px)}
 .rail{background:var(--card);border:1px solid #232d45;border-radius:12px;padding:14px;display:flex;flex-direction:column;overflow:hidden}
 .rail-h{font-weight:bold;font-size:15px;line-height:1.4}
 .rail-sub{color:var(--mut);font-size:12px;margin:2px 0 10px}
