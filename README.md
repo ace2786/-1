@@ -24,7 +24,12 @@ lawfirm ask "本案矛盾点?" --case-id xxx   # CLI
 lawfirm mcp                # MCP stdio server，供任意智能体接入
 ```
 
-MCP 暴露工具：`cases_list / case_detail / case_analyses / analyze_key / search_case_files / ask_assistant`
+MCP 暴露工具：`cases_list / case_detail / case_analyses / analyze_key / search_case_files / sentencing_advise / ask_assistant`
+
+外部智能体接入实证（标准 MCP 协议真实握手，自动发现→选案→检索→量刑）：
+```bash
+.venv/bin/python scripts/mcp_agent_demo.py
+```
 
 ## 🚀 快速开始
 
