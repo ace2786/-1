@@ -106,6 +106,14 @@ def serve(host: str = "127.0.0.1", port: int = 8000):
     uvicorn.run(fastapi_app, host=host, port=port)  # server module already mounts GUI at import
 
 
+@app.command()
+def export(case_id: str, out: str = typer.Option(None, help="输出文件路径，默认写入案件目录")):
+    """导出案件审查报告（Markdown 工作底稿）。"""
+    from ..analysis.exporter import export_file
+    path = export_file(case_id, out_path=out)
+    console.print(f"📄 报告已生成: [bold]{path}[/bold]")
+
+
 @app.command("mcp")
 def mcp_stdio():
     '''以 MCP stdio server 模式运行（供智能体接入）。'''

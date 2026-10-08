@@ -54,6 +54,12 @@ def _tools():
         return json.dumps(advise(charge, amount_yuan, victims, fl), ensure_ascii=False)
 
     @mcp.tool()
+    async def export_report(case_id: str) -> str:
+        """Generate full review report (markdown working draft) for a case; returns file path."""
+        from ..analysis.exporter import export_file
+        return export_file(case_id)
+
+    @mcp.tool()
     async def ask_assistant(case_id: str, question: str, heavy: bool = False) -> str:
         '''Ask the ReAct assistant about a case; returns answer + step trace.'''
         out = await agent_ask(question, case_id, heavy=heavy)

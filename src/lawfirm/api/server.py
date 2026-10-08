@@ -300,6 +300,17 @@ async def analyze(case_id: str, body: AnalyzeBody):
     return await run_all(case_id)
 
 
+@app.get("/api/cases/{case_id}/export")
+async def export_report(case_id: str):
+    """Download the assembled review report as Markdown."""
+    from fastapi.responses import Response
+    from ..analysis.exporter import build_markdown
+    md = build_markdown(case_id)
+    fn = f"review_report_{case_id}.md"
+    return Response(md, media_type="text/markdown; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="{fn}"'})
+
+
 @app.get("/api/cases/{case_id}/analyses")
 async def analyses(case_id: str):
     data = all_analyses(case_id)
